@@ -91,3 +91,16 @@ repository, commit, and original authorship remain recorded above.
   reporting, and synthetic-turn behavior exercised by the source test suite
 - Boundary: no real model inference, hypervisor isolation, workload execution,
   authorization, semantic task success, or release authority is claimed
+- Candidate memory-instrumentation archives:
+  - `anonymized_llm_memory_instrumentation_package.zip`, SHA-256
+    `3CC411DB83C68E33FC0C8201769EA217B99C45FC508A36A56D2E478DA7BDC15B`
+  - `llm_memory_atomized_true_anonymized_package.zip`, SHA-256
+    `BC1087C3332E32EE7699AB2FB79BF99134260E32A56D0198ED2CFF612436D61C`
+- Candidate state: retained in private intake, not imported into the public
+  tree; neither archive contains a license grant
+- Intake result: both archives passed bounded path, type, collision, and CRC
+  checks; the atomized v2 manifest matched 14 of 15 listed file hashes
+- Blocking integrity defect: `12_validation_report.json` hashes to
+  `3795c4ace9df9b07a61eab310d1c217f7f83571eba77f5cb51a353b562a3f900`,
+  not the manifest's
+  `1e5540eeea3f52d3148ef4cb2a2d6b9db62b6915080ba8193690a7d364a939df`

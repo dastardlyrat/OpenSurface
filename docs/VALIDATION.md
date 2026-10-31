@@ -121,3 +121,17 @@ This is source-basis evidence for the public documentation. Synthetic
 Simulations code is not yet included in the storefront, and these tests do not
 prove real model behavior, OS isolation, authenticated authority, semantic
 correctness, crash-safe terminal reporting, or production safety.
+
+Two supplied memory-instrumentation ZIPs were also checked in private intake.
+Both passed CRC, normalized-path, absolute-path, parent-traversal, link, unsafe
+character, and case-collision checks. A bounded residue scan found no private
+machine paths, common credential forms, or email addresses.
+
+The atomized v2 package failed exact manifest validation: 14 of 15 listed files
+matched. Its `12_validation_report.json` member has SHA-256
+`3795c4ace9df9b07a61eab310d1c217f7f83571eba77f5cb51a353b562a3f900`,
+while the manifest records
+`1e5540eeea3f52d3148ef4cb2a2d6b9db62b6915080ba8193690a7d364a939df`.
+Neither candidate contains a license grant. Both remain excluded from the
+public tree pending correction, ownership and licensing confirmation, and a
+deeper privacy review.

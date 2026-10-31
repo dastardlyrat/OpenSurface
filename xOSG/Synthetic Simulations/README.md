@@ -23,6 +23,8 @@ operating system, grant authority, or declare a task successful.
 | Implementation language | Python 3.11+ |
 | Public source import | Not yet staged |
 | Fresh source-suite result | 31/31 tests passed on 2026-10-31 |
+| Memory-instrument candidates | Two private packages inspected |
+| Atomized-package integrity | Blocked: 14/15 manifest hashes match |
 | Model inference | None |
 | Workload launch | Denied |
 | Execution authority | None |
@@ -31,6 +33,18 @@ operating system, grant authority, or declare a task successful.
 The OpenSurface page documents an exercised private prototype. It is not yet a
 source release. Promotion requires a separate dependency, license, packaging,
 and public-interface review.
+
+## Two Project Lanes
+
+Synthetic Simulations currently has two evidence-backed lanes:
+
+1. **Deterministic control-plane simulation** explores bounded roles, contracts,
+   gates, traceability, and non-execution.
+2. **LLM memory instrumentation simulation** explores portable, anonymized
+   behavior and continuity packages as controlled inputs to model experiments.
+
+Neither lane treats a prompt package, declared identity, model response, or
+successful simulation as authority or real-world task completion.
 
 ## Why Simulate
 
@@ -50,7 +64,9 @@ A simulation can answer bounded engineering questions:
 It cannot establish that a person holds authority, a model behaved correctly, a
 sandbox contained a workload, or the underlying mission succeeded.
 
-## System Shape
+## Lane A: Deterministic Control-Plane
+
+### System Shape
 
 ~~~mermaid
 flowchart LR
@@ -77,9 +93,9 @@ retaining distinct authority ceilings.
 The word **hypervisor** names a trace role in this prototype. It does not claim
 virtualization, isolation, privilege control, or a security boundary.
 
-## Simulation Pipeline
+### Simulation Pipeline
 
-### 1. Contract intake
+#### 1. Contract intake
 
 The prototype reads a closed JSON mission contract. Duplicate keys, unknown
 fields, invalid effect declarations, oversized contracts, and ambiguous source
@@ -88,7 +104,7 @@ paths are rejected.
 Declared identity or authority is recorded as a declaration. It is not upgraded
 to authenticated permission merely because the contract is well formed.
 
-### 2. Evidence verification
+#### 2. Evidence verification
 
 Declared local inputs are confined beneath an explicit root and checked against
 SHA-256 values. Missing files, unsafe paths, symlinks, changed bytes, and pin
@@ -97,14 +113,14 @@ drift fail closed.
 The contract and the external kit configuration are pinned independently. A
 mutable filename is never treated as a stable generation by itself.
 
-### 3. Deterministic planning
+#### 3. Deterministic planning
 
 Declared task effects map to profile and module references through deterministic
 rules. Dependency closure is visible in the result. Mapping completion proves
 only that the declared inputs were processed; it does not prove that all effects
 were declared or that a selected module is accepted authority.
 
-### 4. Non-launching setup
+#### 4. Non-launching setup
 
 The setup phase keeps three domains separate:
 
@@ -119,7 +135,7 @@ Every setup result preserves:
 - **can_execute: false**
 - **release_ready: false**
 
-### 5. Synthetic turn
+#### 5. Synthetic turn
 
 A bounded request is registered by digest. The orchestrator proposes a route,
 the expert system blocks task execution, the trace records rule decisions, and
@@ -129,7 +145,7 @@ The response does not echo the request. Request and response SHA-256 values make
 the trace reproducible without presenting the original request as an
 instruction.
 
-### 6. Terminal result
+#### 6. Terminal result
 
 The command-line interface emits one JSON result:
 
@@ -137,6 +153,65 @@ The command-line interface emits one JSON result:
 - **PROBLEM** means validation, integrity, termination, or bounded retry failed.
 
 FINISHED never means the user's underlying task was executed or accepted.
+
+## Lane B: LLM Memory Instrumentation
+
+Two candidate configuration packages were supplied for Synthetic Simulations.
+They are synthesized behavioral scaffolds, not raw memory dumps and not system
+instructions.
+
+| Candidate | Declared version | Archive SHA-256 | Intake state |
+|---|---:|---|---|
+| Anonymized LLM Memory Configuration Package | 1.0.0 | 3CC411DB83C68E33FC0C8201769EA217B99C45FC508A36A56D2E478DA7BDC15B | Structurally safe; no per-file digest ledger or license grant |
+| Atomized Anonymized LLM Configuration Package | 2.0.0 | BC1087C3332E32EE7699AB2FB79BF99134260E32A56D0198ED2CFF612436D61C | Structurally safe; manifest integrity blocked |
+
+The first package organizes an operating profile, behavioral protocol, project
+context synthesis, canonical registry, anti-hallucination instrumentation,
+response contracts, alias handling, redaction record, and combined upload
+prompt.
+
+The second package removes named workstreams and domain narratives in favor of
+abstract operating atoms, intent patterns, whole-document assertions,
+bidirectional application rules, redaction policy, evidence instrumentation,
+and a safety boundary.
+
+### Intake Findings
+
+- Both ZIP files passed CRC and archive-path safety checks.
+- No absolute paths, links, traversal names, case collisions, common credential
+  forms, email addresses, or private machine paths were found by the bounded
+  intake scan.
+- Neither archive contains a license grant or SPDX declaration.
+- The v1 manifest describes members but does not bind them with per-file
+  digests.
+- The v2 manifest binds 15 files, but only 14 match.
+- For v2, the manifest expects
+  **1e5540eeea3f52d3148ef4cb2a2d6b9db62b6915080ba8193690a7d364a939df**
+  for the validation report; the archived bytes hash to
+  **3795c4ace9df9b07a61eab310d1c217f7f83571eba77f5cb51a353b562a3f900**.
+- The packages' anonymization claims remain self-asserted. A clean term scan is
+  useful evidence, but it cannot prove that all identifying combinations or
+  sensitive abstractions are absent.
+
+The raw archives remain in private intake custody and are excluded from the
+public storefront until ownership, licensing, integrity, and a deeper privacy
+review are complete.
+
+### Proposed Experiment Contract
+
+When this lane becomes executable, each synthetic comparison should bind:
+
+- package name, version, and exact digest;
+- target model and interface version;
+- system and safety-policy context;
+- scenario and expected invariant set;
+- permitted and prohibited observations;
+- captured response and trace digests;
+- claim ledger and source-support review;
+- redaction and privacy review;
+- outcome state: pass, fail, blocked, or inconclusive.
+
+This is a proposed public experiment shape, not an implemented runner.
 
 ## Safety Invariants
 
@@ -238,14 +313,22 @@ Source package SHA-256:
 
     7BC0651F4432F55DE1A9877DCB800723D032DC5F865A616EA9EC51A7822B6DA0
 
-The private source remains under project custody while the public package
-boundary is reviewed. This README is a generated public synthesis grounded in
-that source and its fresh test result; it is not a claim that the source has
-already been released.
+Candidate memory-instrumentation archive SHA-256 values:
+
+    3CC411DB83C68E33FC0C8201769EA217B99C45FC508A36A56D2E478DA7BDC15B
+    BC1087C3332E32EE7699AB2FB79BF99134260E32A56D0198ED2CFF612436D61C
+
+The private control-plane source and candidate instrumentation packages remain
+under project custody while their public boundaries are reviewed. This README
+is a generated public synthesis grounded in those sources, the fresh test
+result, and the archive intake. It is not a claim that the source or candidates
+have already been released.
 
 ## License
 
 Future original Synthetic Simulations source published through OpenSurface
 defaults to the repository MIT License unless an individual file records a
 different SPDX license expression. Third-party or candidate dependencies retain
-their own terms and must pass the publication gate before inclusion.
+their own terms and must pass the publication gate before inclusion. The two
+candidate memory-instrumentation archives currently contain no license grant
+and therefore are not included in the public distribution.

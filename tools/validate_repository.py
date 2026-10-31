@@ -325,6 +325,11 @@ def main() -> int:
         and "can_launch: false" in synthetic_simulations_readme
         and "7BC0651F4432F55DE1A9877DCB800723D032DC5F865A616EA9EC51A7822B6DA0"
         in synthetic_simulations_readme
+        and "3CC411DB83C68E33FC0C8201769EA217B99C45FC508A36A56D2E478DA7BDC15B"
+        in synthetic_simulations_readme
+        and "BC1087C3332E32EE7699AB2FB79BF99134260E32A56D0198ED2CFF612436D61C"
+        in synthetic_simulations_readme
+        and "14/15 manifest hashes match" in synthetic_simulations_readme
     )
     checks.append(report(
         "publication_and_xosg_identity",
