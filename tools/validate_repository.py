@@ -310,6 +310,9 @@ def main() -> int:
     xosg_readme = (ROOT / "xOSG" / "README.md").read_text(encoding="utf-8")
     naked_shell_readme = (ROOT / "xOSG" / "Naked Shell" / "README.md").read_text(encoding="utf-8")
     dwsk_readme = (ROOT / "xOSG" / "DWSK" / "README.md").read_text(encoding="utf-8")
+    synthetic_simulations_readme = (
+        ROOT / "xOSG" / "Synthetic Simulations" / "README.md"
+    ).read_text(encoding="utf-8")
     publication_identity = (
         "storefront, not a development dump" in root_readme
         and "OpenSurface Publishing Boundary" in (ROOT / "PUBLISHING.md").read_text(encoding="utf-8")
@@ -317,6 +320,7 @@ def main() -> int:
         and "AI instrumentation toolset" in xosg_readme
         and "natural-language command-line universal shell" in naked_shell_readme
         and "durable workspace" in dwsk_readme
+        and "Synthetic Simulations" in synthetic_simulations_readme
     )
     checks.append(report(
         "publication_and_xosg_identity",
