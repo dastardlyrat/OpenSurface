@@ -35,6 +35,8 @@ Date: 2026-10-31
 - SHA-256: `15C9F5A91B8143F6FB539153EF280DE133F0B8843DBBD231FDFB189C2EC1F786`
 - Import state: effect and API imported from the validated package; SPDX
   publication metadata added without changing shader behavior
+- Published layout:
+  `Camera Obscura/External Image Denoiser/reshade-shaders/Shaders/camera_obscura_external`
 - Local evidence: 30/30 focused validator pass
 - Live evidence: user-confirmed application, output multiplier, applied-pixel
   tint, and Detail Reclamation then final-denoiser order

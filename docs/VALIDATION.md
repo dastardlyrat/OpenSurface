@@ -9,11 +9,13 @@ helper-compiler evidence. This is not a live ReShade runtime attestation.
 
 `python -B tools/validate_repository.py`
 
-Result: 14/14 pass.
+Result: 16/16 pass.
 
 The checks cover:
 
 - five expected effect files and six expected techniques;
+- a clean public file boundary with an independently installable denoiser
+  package and no raw evidence, archive, log, preset, or private-path material;
 - complete local include closure except external `ReShade.fxh`;
 - no bundled ReShade framework header;
 - no legacy `OCCULT` or `MIXSR` symbols in active Lazara source;
@@ -21,6 +23,7 @@ The checks cover:
 - balanced source blocks;
 - four exact source revisions in the provenance ledger;
 - source-manifest integrity.
+- local README image and document-link resolution.
 
 The publication validator also requires inline SPDX copyright and MIT license
 identifiers on every active shader source, canonical license texts, authorship
@@ -35,8 +38,8 @@ Specification: REUSE 3.3
 
 Result: compliant.
 
-- covered files with copyright information: 36/36;
-- covered files with licensing information: 36/36;
+- covered files with copyright information: 31/31;
+- covered files with licensing information: 31/31;
 - bad, deprecated, missing, unused, or malformed licenses: zero;
 - used licenses: `MIT` and `LicenseRef-Documentation-Screenshot`.
 
@@ -54,6 +57,8 @@ Result: compliant.
 
 ## External Image Denoiser checks
 
+Private source-package validator, retained outside the storefront:
+
 `python -B validate_external_denoiser_v1.py`
 
 Result: 30/30 pass against the accepted source package.
@@ -64,6 +69,17 @@ resources, ordered filtering and history capture, requested-UV admission,
 depth-aware history rejection, all 32 scale-response combinations, bounded
 multiscale reconstruction, exact zero bypasses, display-only tinting, package
 and ZIP parity, and fresh FXC `/Gec` plus `/Ges /WX` compilation.
+
+## Publication sanitation
+
+The public tree is checked for private Windows user paths, Steam installation
+paths, application-data paths, private account-name markers, common credential
+forms, private-key headers, raw evidence directories, logs, presets, backup
+files, and package archives. The current publication tree passes this check.
+
+Raw validation records and exploratory worksheets remain in private source
+custody. Accepted facts are carried into this bounded summary instead of
+publishing the workshop artifacts themselves.
 
 ## Lazara refactor compiler checks
 

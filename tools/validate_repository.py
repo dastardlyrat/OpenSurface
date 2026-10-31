@@ -14,7 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 MANIFEST = ROOT / "SOURCE_MANIFEST.sha256"
 
 EXPECTED_EFFECTS = {
-    "Camera Obscura/External Image Denoiser/effects/CAMERA_OBSCURA_ExternalImageDenoiseV1.fx",
+    "Camera Obscura/External Image Denoiser/reshade-shaders/Shaders/camera_obscura_external/effects/CAMERA_OBSCURA_ExternalImageDenoiseV1.fx",
     "Camera Obscura/Guided Detail/effects/OSCO_GuidedDetailReclamation.fx",
     "Camera Obscura/Guided Detail/effects/OSCO_GuidedInkLines.fx",
     "Camera Obscura/Stabilized Detail Cache/effects/CAMERA_OBSCURA_StabilizedDetailCacheV1.fx",
@@ -89,6 +89,80 @@ def validate_manifest() -> tuple[bool, str]:
     return passed, detail
 
 
+def validate_publication_boundary() -> tuple[bool, str]:
+    denied_directories = {
+        "backup",
+        "evidence",
+        "inbox",
+        "mill",
+        "outbox",
+        "recovery",
+        "staging",
+    }
+    denied_suffixes = {".bak", ".ini", ".log", ".zip"}
+    text_suffixes = {
+        "",
+        ".csv",
+        ".fx",
+        ".fxh",
+        ".json",
+        ".md",
+        ".py",
+        ".sha256",
+        ".toml",
+        ".txt",
+    }
+    private_patterns = {
+        "windows_user_path": re.compile(r"[A-Za-z]:\\Users\\", re.IGNORECASE),
+        "steam_library_path": re.compile(r"[A-Za-z]:\\SteamLibrary\\", re.IGNORECASE),
+        "private_username": re.compile("private" + "user", re.IGNORECASE),
+        "application_data_path": re.compile(r"AppData[\\/]", re.IGNORECASE),
+        "codex_private_path": re.compile(r"\.codex[\\/]", re.IGNORECASE),
+        "github_classic_token": re.compile(r"ghp_[A-Za-z0-9]{20,}"),
+        "github_fine_grained_token": re.compile(r"github_pat_[A-Za-z0-9_]{20,}"),
+        "aws_access_key": re.compile(r"AKIA[0-9A-Z]{16}"),
+        "private_key": re.compile(r"BEGIN [A-Z ]*PRIVATE KEY"),
+    }
+
+    denied_paths: list[str] = []
+    private_hits: list[str] = []
+    for path in sorted(ROOT.rglob("*")):
+        if not path.is_file() or ".git" in path.parts:
+            continue
+        rel = relative(path)
+        lowered_parts = {part.lower() for part in path.relative_to(ROOT).parts[:-1]}
+        if lowered_parts & denied_directories or path.suffix.lower() in denied_suffixes:
+            denied_paths.append(rel)
+        if path.suffix.lower() not in text_suffixes:
+            continue
+        try:
+            text = path.read_text(encoding="utf-8")
+        except UnicodeDecodeError:
+            private_hits.append(f"{rel}:non_utf8_text")
+            continue
+        for name, pattern in private_patterns.items():
+            if pattern.search(text):
+                private_hits.append(f"{rel}:{name}")
+
+    required_package_files = [
+        ROOT / "Camera Obscura" / "External Image Denoiser" / "LICENSE",
+        ROOT / "Camera Obscura" / "External Image Denoiser" / "README.md",
+        ROOT / "Camera Obscura" / "External Image Denoiser" / "reshade-shaders" / "Shaders"
+        / "camera_obscura_external" / "api" / "CAMERA_OBSCURA_API_ExternalImageDenoise.fxh",
+        ROOT / "Camera Obscura" / "External Image Denoiser" / "reshade-shaders" / "Shaders"
+        / "camera_obscura_external" / "effects" / "CAMERA_OBSCURA_ExternalImageDenoiseV1.fx",
+        ROOT / "PUBLISHING.md",
+    ]
+    missing = [relative(path) for path in required_package_files if not path.is_file()]
+    passed = not denied_paths and not private_hits and not missing
+    detail = (
+        "clean public tree; denoiser package is independently installable"
+        if passed
+        else f"denied_paths={denied_paths}; private_hits={private_hits}; missing={missing}"
+    )
+    return passed, detail
+
+
 def main() -> int:
     files = source_files()
     effects = {relative(path) for path in files if path.suffix.lower() == ".fx"}
@@ -110,6 +184,9 @@ def main() -> int:
         techniques == EXPECTED_TECHNIQUES,
         f"techniques={sorted(techniques)}",
     ))
+
+    boundary_passed, boundary_detail = validate_publication_boundary()
+    checks.append(report("publication_boundary", boundary_passed, boundary_detail))
 
     include_passed, include_detail = validate_include_closure(files)
     checks.append(report("local_include_closure", include_passed, include_detail))
@@ -209,10 +286,31 @@ def main() -> int:
         else f"missing={missing_images}; attachments={attachment_images}",
     ))
 
+    missing_links: list[str] = []
+    markdown_link_pattern = re.compile(r"(?<!!)\[[^\]]+\]\(([^)]+)\)")
+    for readme in readmes:
+        readme_text = readme.read_text(encoding="utf-8")
+        for reference in markdown_link_pattern.findall(readme_text):
+            target_reference = reference.split("#", 1)[0]
+            if (
+                not target_reference
+                or target_reference.startswith(("http://", "https://", "mailto:"))
+            ):
+                continue
+            target = (readme.parent / unquote(target_reference)).resolve()
+            if not target.exists():
+                missing_links.append(f"{relative(readme)} -> {reference}")
+    checks.append(report(
+        "local_readme_links",
+        not missing_links,
+        "all local README links resolve" if not missing_links else f"missing={missing_links}",
+    ))
+
     root_readme = (ROOT / "README.md").read_text(encoding="utf-8")
     naked_readme = (ROOT / "Naked Shell" / "README.md").read_text(encoding="utf-8")
     publication_identity = (
-        "license-adhering publication end" in root_readme
+        "storefront, not a development dump" in root_readme
+        and "OpenSurface Publishing Boundary" in (ROOT / "PUBLISHING.md").read_text(encoding="utf-8")
         and "natural-language command-line universal shell" in naked_readme
     )
     checks.append(report(

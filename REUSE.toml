@@ -11,6 +11,7 @@ path = [
   "LICENSE",
   "LICENSES/*.txt",
   "LICENSING.md",
+  "PUBLISHING.md",
   "README.md",
   "SOURCE_MANIFEST.sha256",
   "THIRD_PARTY_NOTICES.md",

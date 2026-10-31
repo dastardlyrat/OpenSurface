@@ -55,9 +55,8 @@ math/diagnostic harness. A fresh live ReShade compile and side-by-side visual
 regression against the public Lazara build are required before this version
 supersedes it.
 
-The retained historical design record is in `docs/SOURCE_HISTORY.md`. Statements
-inside it refer to the earlier source paths and identifiers unless explicitly
-updated here.
+The public source lineage and refactor boundary are recorded in the repository
+provenance ledger. Raw development history remains in private project custody.
 
 ## License
 
