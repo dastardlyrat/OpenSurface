@@ -68,8 +68,13 @@ repository, commit, and original authorship remain recorded above.
 ## xOSG | expert Overlay System Gestalt
 
 - Source: none
-- State: accepted project identity as an AI instrumentation toolset;
-  implementation remains unstaged
+- State: accepted project identity as an AI instrumentation toolset
+- Accepted members:
+  - Naked Shell
+  - DWSK | durable workspace
+  - IG | Identity Gestalt
+  - IG/identity-atomic-cataloger
+- Implementation state: unstaged for each member
 - Authority: user decision for identity and publication family only
 - License continuation: future original source defaults to MIT unless a file
   states another SPDX license expression

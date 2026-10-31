@@ -21,7 +21,7 @@ continue forward; publication never silently replaces them.
 | [Guided Detail](Camera%20Obscura/Guided%20Detail/) | Same-surface detail reclamation and guided line emphasis | Published source with diagnostic workflow |
 | [Stabilized Detail Cache](Camera%20Obscura/Stabilized%20Detail%20Cache/) | Captures bounded signed detail and restores it later in the chain | Live compile and visual pass recorded |
 | [Lazara Color Revival](Camera%20Obscura/Lazara%20Color%20Revival/) | Recovers muted source color or deliberately removes it | Refactored candidate; live regression still required |
-| [xOSG](xOSG/) | **expert Overlay System Gestalt**, an AI instrumentation toolset | Product identity reserved; implementation not published |
+| [xOSG](xOSG/) | **expert Overlay System Gestalt**, the AI instrumentation family for Naked Shell, DWSK, and Identity Gestalt | Subproject identities staged; implementation not published |
 
 ## Camera Obscura
 

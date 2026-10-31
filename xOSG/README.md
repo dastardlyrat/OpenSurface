@@ -2,18 +2,21 @@
 
 **expert Overlay System Gestalt**
 
-xOSG is an AI instrumentation toolset.
+xOSG is an AI instrumentation toolset and the publication family for:
 
-Its accepted purpose is to provide a publication home for instruments that
-observe, expose, and help evaluate AI-system behavior through an overlay
-system. The name and project category are established here without implying
-that an implementation already exists.
+- [Naked Shell](Naked%20Shell/)
+- [DWSK | durable workspace](DWSK/)
+- [IG | Identity Gestalt](IG/)
+- [identity-atomic-cataloger](IG/identity-atomic-cataloger/)
 
-Current truth state: project identity and publication family accepted.
+The family identity and project membership are established here without
+implying that implementations already exist.
+
+Current truth state: xOSG and the listed member identities are accepted.
 Implementation, supported AI systems, instrumentation surfaces, overlay
 behavior, data contracts, execution authority, security boundaries, and
-platform support remain unstaged.
+platform support remain unstaged unless a member project records otherwise.
 
-Future xOSG work belongs here as a separate software family from Camera
-Obscura. Original software published here continues under the repository MIT
-License unless an individual file carries a different SPDX license expression.
+xOSG is a separate software family from Camera Obscura. Original software
+published here continues under the repository MIT License unless an individual
+file carries a different SPDX license expression.
