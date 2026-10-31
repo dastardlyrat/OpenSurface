@@ -322,6 +322,7 @@ def main() -> int:
         and "AI instrumentation toolset" in xosg_readme
         and "natural-language command-line universal shell" in naked_shell_readme
         and "Amorphous Durable AI Workspace" in durable_workspace_readme
+        and "Durable Workspace Development Kit (DWSK) 0.1.1" in durable_workspace_readme
         and "Synthetic Simulations" in synthetic_simulations_readme
         and "deterministic AI control-plane simulation" in synthetic_simulations_readme
         and "can_launch: false" in synthetic_simulations_readme

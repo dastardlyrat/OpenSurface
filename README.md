@@ -21,7 +21,7 @@ continue forward; publication never silently replaces them.
 | [Guided Detail](Camera%20Obscura/Guided%20Detail/) | Same-surface detail reclamation and guided line emphasis | Published source with diagnostic workflow |
 | [Stabilized Detail Cache](Camera%20Obscura/Stabilized%20Detail%20Cache/) | Captures bounded signed detail and restores it later in the chain | Live compile and visual pass recorded |
 | [Lazara Color Revival](Camera%20Obscura/Lazara%20Color%20Revival/) | Recovers muted source color or deliberately removes it | Refactored candidate; live regression still required |
-| [xOSG](xOSG/) | **expert Overlay System Gestalt**, the AI instrumentation family for Naked Shell, Amorphous Durable AI Workspace, and Synthetic Simulations | Subproject identities staged; implementation not published |
+| [xOSG](xOSG/) | **expert Overlay System Gestalt**, the AI instrumentation family for Naked Shell, Amorphous Durable AI Workspace, and Synthetic Simulations | DWSK 0.1.1 published; Synthetic Simulations architecture and bounded evidence documented |
 
 ## Camera Obscura
 
@@ -73,6 +73,10 @@ xOSG, **expert Overlay System Gestalt**, is the OpenSurface family for AI
 instrumentation. Its current members are Naked Shell, Amorphous Durable AI
 Workspace, and
 [Synthetic Simulations](xOSG/Synthetic%20Simulations/).
+
+Amorphous Durable AI Workspace contains the Durable Workspace Development Kit
+(DWSK) 0.1.1: a Python library and command-line tool for transactional project
+state, hash-chained journals, verified snapshots, and quorum recovery.
 
 Synthetic Simulations has an exercised v0.4 private prototype: a deterministic,
 non-launching AI control-plane simulation with closed contracts, pinned input

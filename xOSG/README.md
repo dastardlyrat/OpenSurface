@@ -5,11 +5,13 @@
 xOSG is an AI instrumentation toolset and the publication family for:
 
 - [Naked Shell](Naked%20Shell/)
-- [Amorphous Durable AI Workspace](amorphous-durable-ai-workspace/)
+- [Amorphous Durable AI Workspace | DWSK](amorphous-durable-ai-workspace/)
 - [Synthetic Simulations](Synthetic%20Simulations/)
 
-The family identity and project membership are established here without
-implying that implementations already exist.
+Amorphous Durable AI Workspace contains the validated DWSK 0.1.1 source and
+portable build report. Synthetic Simulations documents an exercised private
+prototype and two quarantined candidate packages; its implementation is not
+yet published here. Naked Shell remains an accepted staged identity.
 
 Current truth state: xOSG and the listed member identities are accepted.
 Implementation, supported AI systems, instrumentation surfaces, overlay

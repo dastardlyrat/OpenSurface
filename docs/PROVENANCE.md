@@ -73,10 +73,36 @@ repository, commit, and original authorship remain recorded above.
   - Naked Shell
   - Amorphous Durable AI Workspace
   - Synthetic Simulations
-- Implementation state: unstaged for each member
+- Implementation state: DWSK 0.1.1 is staged under Amorphous Durable AI
+  Workspace; Naked Shell remains identity-only; Synthetic Simulations is a
+  documentation-only publication of an exercised private prototype
 - Authority: user decision for identity and publication family only
 - License continuation: future original source defaults to MIT unless a file
   states another SPDX license expression
+
+### Amorphous Durable AI Workspace
+
+- Published component: Durable Workspace Development Kit (DWSK) 0.1.1
+- Source import: repository commit
+  `4c3d8e71d4dc61c2a5d86d5eeeecebb8ea4dd02a` populated the bounded xOSG
+  member from its validated source build
+- Runtime source: five Python package files under `src/durable_workspace`
+- Declared runtime requirement: Python 3.11 or later; standard library only
+- Recorded source evidence: 32 hardening, 1,000 deterministic fuzzy, eight
+  torture, 17 unit, seven self-validation, 15 CLI, eight retry, and 12 native
+  mutex checks; the retained reports distinguish source and installed-artifact
+  campaigns
+- Fresh OpenSurface evidence: component unit tests, self-validation, and source
+  digest checks are recorded in `docs/VALIDATION.md`
+- Boundary: durable storage and recovery mechanics only; no automatic
+  conversation capture, agent service, semantic authority, or governance
+  authority
+- Platform ceiling: recorded validation is Windows/Python 3.14 evidence, not
+  proof for every interpreter, OS, physical power-loss case, or application
+  integration
+- Design lineage: `MINING_PROVENANCE.md` records the two informing artifacts
+  and expressly does not adopt or claim authority over the Knowledge Core
+  design
 
 ### Synthetic Simulations
 

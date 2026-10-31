@@ -22,7 +22,7 @@ The checks cover:
 - exactly two Lazara-owned headers;
 - balanced source blocks;
 - four exact source revisions in the provenance ledger;
-- source-manifest integrity.
+- source-manifest integrity;
 - local README image and document-link resolution.
 
 The publication validator also requires inline SPDX copyright and MIT license
@@ -38,8 +38,8 @@ Specification: REUSE 3.3
 
 Result: compliant.
 
-- covered files with copyright information: 34/34;
-- covered files with licensing information: 34/34;
+- covered files with copyright information: 66/66;
+- covered files with licensing information: 66/66;
 - bad, deprecated, missing, unused, or malformed licenses: zero;
 - used licenses: `MIT` and `LicenseRef-Documentation-Screenshot`.
 
@@ -89,6 +89,37 @@ publishing the workshop artifacts themselves.
 Microsoft FXC does not compile complete ReShade effect syntax. Full
 `OSCO_LazaraColorRevival.fx` compilation and visual equivalence remain live
 ReShade gates.
+
+## Amorphous Durable AI Workspace checks
+
+The staged DWSK 0.1.1 component was checked directly from its OpenSurface
+source tree on Windows with Python 3.14.
+
+Unit suite, with the source-layout import root made explicit:
+
+`$env:PYTHONPATH='src'; python -B -W error -m unittest discover -s tests -v`
+
+Result: 17/17 pass.
+
+Component self-validation:
+
+`python -B -W error validate.py`
+
+Result: 7/7 pass, including four concurrent writers and 200 commits, snapshot
+verification, recovery after loss of each individual representation, and
+runtime journal-tamper detection.
+
+All 32 entries in `SOURCE_SHA256SUMS` matched the staged file bytes.
+
+The first unit invocation omitted `src` from Python's import path and stopped
+with two test-module import errors. No test body ran. The corrected source-tree
+invocation above passed all 17 tests; the initial failure is retained here to
+distinguish invocation setup from implementation behavior.
+
+These fresh checks support the staged source on this machine. They do not
+repeat the retained 1,000-case fuzzy campaign, installed-wheel checks, native
+mutex campaign, physical power-loss testing, cross-platform testing, or
+application integration recorded or bounded by the component reports.
 
 ## Runtime evidence
 
