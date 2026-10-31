@@ -321,6 +321,10 @@ def main() -> int:
         and "natural-language command-line universal shell" in naked_shell_readme
         and "durable workspace" in dwsk_readme
         and "Synthetic Simulations" in synthetic_simulations_readme
+        and "deterministic AI control-plane simulation" in synthetic_simulations_readme
+        and "can_launch: false" in synthetic_simulations_readme
+        and "7BC0651F4432F55DE1A9877DCB800723D032DC5F865A616EA9EC51A7822B6DA0"
+        in synthetic_simulations_readme
     )
     checks.append(report(
         "publication_and_xosg_identity",

@@ -67,6 +67,18 @@ admitted chroma while preserving source luma.
 
 ![Lazara Color Revival comparison](Camera%20Obscura/Lazara%20Color%20Revival/docs/images/lazara-color-revival-comparison.png)
 
+## xOSG
+
+xOSG, **expert Overlay System Gestalt**, is the OpenSurface family for AI
+instrumentation. Its current members are Naked Shell, DWSK, and
+[Synthetic Simulations](xOSG/Synthetic%20Simulations/).
+
+Synthetic Simulations has an exercised v0.4 private prototype: a deterministic,
+non-launching AI control-plane simulation with closed contracts, pinned input
+hashes, bounded role authority, and inspectable decision traces. Its source is
+not yet promoted into the storefront; the public project page records the
+verified architecture, evidence ceiling, and remaining publication gates.
+
 ## Installation
 
 Open the README inside the effect you want to install. Components with a

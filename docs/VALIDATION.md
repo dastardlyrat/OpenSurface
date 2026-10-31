@@ -101,3 +101,23 @@ ReShade gates.
   gates.
 - Lazara Color Revival requires a new live compile and side-by-side regression
   because its ownership and include topology changed.
+
+## Synthetic Simulations evidence
+
+The private `deterministic_ai_control_plane_v0_4` source suite was rerun on
+2026-10-31 with Python bytecode generation disabled:
+
+`python -B -W error -m unittest discover -s tests -v`
+
+Result: 31/31 pass.
+
+The exercised behaviors include closed-contract rejection, confined source
+hashing, deterministic profile closure, non-authorizing planning, non-launching
+agent setup, bounded retry, cooperative termination, one-line terminal JSON,
+synthetic-role topology, deterministic trace hashes, malicious-request
+non-echo, and fail-closed invalid setup or request handling.
+
+This is source-basis evidence for the public documentation. Synthetic
+Simulations code is not yet included in the storefront, and these tests do not
+prove real model behavior, OS isolation, authenticated authority, semantic
+correctness, crash-safe terminal reporting, or production safety.

@@ -77,3 +77,17 @@ repository, commit, and original authorship remain recorded above.
 - Authority: user decision for identity and publication family only
 - License continuation: future original source defaults to MIT unless a file
   states another SPDX license expression
+
+### Synthetic Simulations
+
+- Private source project: `deterministic_ai_control_plane_v0_4`
+- Project version: `0.4.0`
+- Source package SHA-256:
+  `7BC0651F4432F55DE1A9877DCB800723D032DC5F865A616EA9EC51A7822B6DA0`
+- Public import state: documentation only; prototype source is not staged in
+  OpenSurface
+- Fresh local evidence on 2026-10-31: 31/31 Python unit tests passed
+- Verified scope: deterministic contract, evidence, setup, planning, terminal
+  reporting, and synthetic-turn behavior exercised by the source test suite
+- Boundary: no real model inference, hypervisor isolation, workload execution,
+  authorization, semantic task success, or release authority is claimed
