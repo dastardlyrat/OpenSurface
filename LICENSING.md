@@ -7,6 +7,9 @@ the authorship, source revision, and notices carried by each admitted project.
   `OpenSurface Camera Obscura contributors` notice.
 - **Stabilized Detail Cache:** project-owned source is now expressly published
   under MIT by owner direction, with its package provenance retained.
+- **External Image Denoiser:** project-owned standalone denoiser source is
+  expressly published under MIT, with the accepted V2.1 package hash and
+  denoiser-only boundary retained.
 - **Lazara Color Revival:** project-owned Lazara source is now expressly
   published under MIT by owner direction. The renamed refactor preserves the
   source repository and revision in the provenance ledger.

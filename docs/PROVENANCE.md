@@ -28,6 +28,23 @@ Date: 2026-10-31
 - License continuation: project-owned source expressly published under MIT on
   2026-10-31 by owner direction
 
+## External Image Denoiser
+
+- Source artifact:
+  `CAMERA_OBSCURA_EXTERNAL_IMAGE_DENOISER_V2_1_MULTISCALE_ORDERED_2026-10-30.zip`
+- SHA-256: `15C9F5A91B8143F6FB539153EF280DE133F0B8843DBBD231FDFB189C2EC1F786`
+- Import state: effect and API imported from the validated package; SPDX
+  publication metadata added without changing shader behavior
+- Local evidence: 30/30 focused validator pass
+- Live evidence: user-confirmed application, output multiplier, applied-pixel
+  tint, and Detail Reclamation then final-denoiser order
+- Unresolved evidence: broader quality, motion, performance, scale, ghosting,
+  and artifact acceptance remain open
+- Boundary: standalone source-domain denoiser; no Twin Lantern GI generation,
+  transport, reconstruction, indirect-light authority, or additive composite
+- License continuation: project-owned source expressly published under MIT on
+  2026-10-31 by owner direction
+
 ## Lazara Color Revival
 
 - Source: `https://github.com/dastardlyrat/lazara`

@@ -14,6 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 MANIFEST = ROOT / "SOURCE_MANIFEST.sha256"
 
 EXPECTED_EFFECTS = {
+    "Camera Obscura/External Image Denoiser/effects/CAMERA_OBSCURA_ExternalImageDenoiseV1.fx",
     "Camera Obscura/Guided Detail/effects/OSCO_GuidedDetailReclamation.fx",
     "Camera Obscura/Guided Detail/effects/OSCO_GuidedInkLines.fx",
     "Camera Obscura/Stabilized Detail Cache/effects/CAMERA_OBSCURA_StabilizedDetailCacheV1.fx",
@@ -21,6 +22,7 @@ EXPECTED_EFFECTS = {
 }
 
 EXPECTED_TECHNIQUES = {
+    "CAMERA_OBSCURA_ExternalImageDenoiseV1",
     "OSCO_GuidedDetailReclamation",
     "OSCO_GuidedInkLines",
     "CAMERA_OBSCURA_StabilizedDetailCaptureV1",
@@ -229,9 +231,10 @@ def main() -> int:
             "68850554650abe22cca029a65f7a807b6b3b3047",
             "d6f80edec87178a9522fb6682765bf2a854f998f",
             "5B10BF3A81BD1A00AFCC379D6DCC00D18748FFCEAEC16093578A59EE197C3B4D",
+            "15C9F5A91B8143F6FB539153EF280DE133F0B8843DBBD231FDFB189C2EC1F786",
         )
     )
-    checks.append(report("source_provenance", revisions_present, "three source revisions recorded"))
+    checks.append(report("source_provenance", revisions_present, "four source revisions recorded"))
 
     manifest_passed, manifest_detail = validate_manifest()
     checks.append(report("source_manifest", manifest_passed, manifest_detail))

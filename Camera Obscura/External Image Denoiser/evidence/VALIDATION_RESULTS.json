@@ -1,0 +1,158 @@
+{
+  "scope": "Camera Obscura external source-domain denoiser V2.1 Multiscale",
+  "truth_state": "static/API compiler/package validation only; complete ReShade compile and live visual proof pending",
+  "passed": 30,
+  "failed": 0,
+  "checks": [
+    {
+      "name": "local_include_closure",
+      "passed": true,
+      "detail": "zero missing local includes"
+    },
+    {
+      "name": "denoiser_only_no_gi_pipeline",
+      "passed": true,
+      "detail": "no transport, reconstruction, indirect, or composite symbols"
+    },
+    {
+      "name": "source_domain_output_only",
+      "passed": true,
+      "detail": "denoised history is a bounded source-domain correction; optional tint is display-only"
+    },
+    {
+      "name": "flat_fully_initialized_record",
+      "passed": true,
+      "detail": "fields=15; initialized=15"
+    },
+    {
+      "name": "bounded_operator_interface",
+      "passed": true,
+      "detail": "visible controls=23"
+    },
+    {
+      "name": "seven_managed_full_resolution_resources",
+      "passed": true,
+      "detail": "textures=7; samplers=7"
+    },
+    {
+      "name": "ordered_filter_history_display_graph",
+      "passed": true,
+      "detail": "pass order=['ExternalDenoise', 'CaptureSourceHistory', 'CaptureDenoisedHistory', 'Display']"
+    },
+    {
+      "name": "requested_uv_admission_before_reads",
+      "passed": true,
+      "detail": "current and history support check requested coverage before texture reads"
+    },
+    {
+      "name": "history_readiness_and_depth_rejection",
+      "passed": true,
+      "detail": "history is denied before frame readiness and spatial/temporal support is depth-aware"
+    },
+    {
+      "name": "explicit_diagnostics",
+      "passed": true,
+      "detail": "target, trust, authority, applied difference, clamp, and motion views present"
+    },
+    {
+      "name": "low_amplitude_difference_diagnostics",
+      "passed": true,
+      "detail": "applied and pre-authority candidate differences are visible at 32x display-only gain"
+    },
+    {
+      "name": "five_independent_scale_bands",
+      "passed": true,
+      "detail": "five admitted radii feed independent telescoping frequency-band corrections"
+    },
+    {
+      "name": "five_render_target_scale_evidence",
+      "passed": true,
+      "detail": "band and scale-summary evidence leave the denoise pass explicitly"
+    },
+    {
+      "name": "all_32_scale_response_combinations",
+      "passed": true,
+      "detail": "every subset from no bands through all five has a bounded exact union"
+    },
+    {
+      "name": "telescoping_scale_reconstruction",
+      "passed": true,
+      "detail": "all bands reconstruct the broadest admitted level; zero bands reconstruct source"
+    },
+    {
+      "name": "synthetic_multiscale_reconstruction_bounds",
+      "passed": true,
+      "detail": "5000 mixed-band cases remain bounded after scale reconstruction and spatial authority"
+    },
+    {
+      "name": "output_multiplier_bounds_and_zero_bypass",
+      "passed": true,
+      "detail": "5000 correction multipliers through 4x stay bounded and multiplier zero returns source exactly"
+    },
+    {
+      "name": "display_only_applied_pixel_tint",
+      "passed": true,
+      "detail": "bright tint and mask are owned by the final display pass and cannot enter denoised history"
+    },
+    {
+      "name": "confirmed_detail_then_final_denoiser_order",
+      "passed": true,
+      "detail": "package records Detail Reclamation first and External Denoiser last"
+    },
+    {
+      "name": "synthetic_temporal_residual_rejection",
+      "passed": true,
+      "detail": "trusts=[0.9, 0.9, 0.797128, 0.485494, 0.154177, 0.0, 0.0]"
+    },
+    {
+      "name": "synthetic_exact_authority_denials",
+      "passed": true,
+      "detail": "zero target and zero strengths produce exact zero authority"
+    },
+    {
+      "name": "synthetic_source_domain_bounds",
+      "passed": true,
+      "detail": "5000 deterministic temporal and spatial source-domain blends remain bounded"
+    },
+    {
+      "name": "external_to_active_twin_lantern",
+      "passed": true,
+      "detail": "active Twin Lantern denoise API/effect files=0"
+    },
+    {
+      "name": "isolated_from_camera_obscura_api_umbrella",
+      "passed": true,
+      "detail": "external denoiser is not internal Twin Lantern wiring"
+    },
+    {
+      "name": "withdrawn_gi_denoisers_not_delivered",
+      "passed": true,
+      "detail": "no V4/V4.1 GI-bearing denoiser ZIP remains in outbox"
+    },
+    {
+      "name": "fresh_compatibility_compile",
+      "passed": true,
+      "detail": "FXC /Gec pass"
+    },
+    {
+      "name": "fresh_strict_compile",
+      "passed": true,
+      "detail": "FXC /Ges /WX pass"
+    },
+    {
+      "name": "frozen_ver_0001_unchanged",
+      "passed": true,
+      "detail": "baseline files=79; current files=79"
+    },
+    {
+      "name": "package_manifest",
+      "passed": true,
+      "detail": "entries=4"
+    },
+    {
+      "name": "zip_byte_parity",
+      "passed": true,
+      "detail": "entries=5"
+    }
+  ]
+}

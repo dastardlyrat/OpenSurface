@@ -13,13 +13,13 @@ Result: 14/14 pass.
 
 The checks cover:
 
-- four expected effect files and five expected techniques;
+- five expected effect files and six expected techniques;
 - complete local include closure except external `ReShade.fxh`;
 - no bundled ReShade framework header;
 - no legacy `OCCULT` or `MIXSR` symbols in active Lazara source;
 - exactly two Lazara-owned headers;
 - balanced source blocks;
-- three exact source revisions in the provenance ledger;
+- four exact source revisions in the provenance ledger;
 - source-manifest integrity.
 
 The publication validator also requires inline SPDX copyright and MIT license
@@ -35,8 +35,8 @@ Specification: REUSE 3.3
 
 Result: compliant.
 
-- covered files with copyright information: 31/31;
-- covered files with licensing information: 31/31;
+- covered files with copyright information: 36/36;
+- covered files with licensing information: 36/36;
 - bad, deprecated, missing, unused, or malformed licenses: zero;
 - used licenses: `MIT` and `LicenseRef-Documentation-Screenshot`.
 
@@ -47,6 +47,23 @@ Result: compliant.
   added after import.
 - Stabilized Detail Cache effect and API match package SHA-256
   `5B10BF3A81BD1A00AFCC379D6DCC00D18748FFCEAEC16093578A59EE197C3B4D`.
+- External Image Denoiser V2.1 originates from the accepted package with
+  SHA-256
+  `15C9F5A91B8143F6FB539153EF280DE133F0B8843DBBD231FDFB189C2EC1F786`;
+  publication-only SPDX metadata was added to its shader sources.
+
+## External Image Denoiser checks
+
+`python -B validate_external_denoiser_v1.py`
+
+Result: 30/30 pass against the accepted source package.
+
+The focused checks cover local include closure, denoiser-only ownership,
+complete record initialization, bounded controls, seven managed full-resolution
+resources, ordered filtering and history capture, requested-UV admission,
+depth-aware history rejection, all 32 scale-response combinations, bounded
+multiscale reconstruction, exact zero bypasses, display-only tinting, package
+and ZIP parity, and fresh FXC `/Gec` plus `/Ges /WX` compilation.
 
 ## Lazara refactor compiler checks
 
@@ -62,5 +79,9 @@ ReShade gates.
 - Guided Detail retains its source repository's recorded evidence boundary.
 - Stabilized Detail Cache has a user-reported clean compile and strong visual
   pass on 2026-10-31.
+- External Image Denoiser application and the Detail Reclamation then final
+  denoiser order were user-confirmed before publication. Broader motion,
+  performance, ghosting, scale, and artifact acceptance remain open runtime
+  gates.
 - Lazara Color Revival requires a new live compile and side-by-side regression
   because its ownership and include topology changed.

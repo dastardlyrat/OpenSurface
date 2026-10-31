@@ -17,6 +17,7 @@ retain their own stated terms and are never silently relicensed.
 OpenSurface/
 |-- Camera Obscura/
 |   |-- Guided Detail/
+|   |-- External Image Denoiser/
 |   |-- Stabilized Detail Cache/
 |   `-- Lazara Color Revival/
 |-- Naked Shell/
@@ -36,6 +37,18 @@ Two same-surface effects:
 This unit is imported without source changes from the accepted public Guided
 Detail repository. Its local README contains the controls, diagnostics, and
 test procedure.
+
+### External Image Denoiser
+
+A standalone source-domain denoiser for an already-composited image. It detects
+tiny, small, medium, large, and extra-large noise bands independently, combines
+spatial and temporal evidence, and exposes the final applied correction without
+owning Twin Lantern GI, transport, reconstruction, or additive lighting.
+
+V2.1 passed its focused 30/30 local validation. The user confirmed live
+application, multiplier behavior, bright applied-pixel tint, and the standalone
+order with Detail Reclamation before the denoiser. Broader motion, performance,
+and artifact acceptance remain separately bounded.
 
 ### Stabilized Detail Cache
 
