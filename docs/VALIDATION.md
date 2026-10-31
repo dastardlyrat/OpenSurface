@@ -38,8 +38,8 @@ Specification: REUSE 3.3
 
 Result: compliant.
 
-- covered files with copyright information: 35/35;
-- covered files with licensing information: 35/35;
+- covered files with copyright information: 33/33;
+- covered files with licensing information: 33/33;
 - bad, deprecated, missing, unused, or malformed licenses: zero;
 - used licenses: `MIT` and `LicenseRef-Documentation-Screenshot`.
 

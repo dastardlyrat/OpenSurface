@@ -6,8 +6,6 @@ xOSG is an AI instrumentation toolset and the publication family for:
 
 - [Naked Shell](Naked%20Shell/)
 - [DWSK | durable workspace](DWSK/)
-- [IG | Identity Gestalt](IG/)
-- [identity-atomic-cataloger](IG/identity-atomic-cataloger/)
 
 The family identity and project membership are established here without
 implying that implementations already exist.

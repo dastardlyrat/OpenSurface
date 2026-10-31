@@ -72,8 +72,6 @@ repository, commit, and original authorship remain recorded above.
 - Accepted members:
   - Naked Shell
   - DWSK | durable workspace
-  - IG | Identity Gestalt
-  - IG/identity-atomic-cataloger
 - Implementation state: unstaged for each member
 - Authority: user decision for identity and publication family only
 - License continuation: future original source defaults to MIT unless a file

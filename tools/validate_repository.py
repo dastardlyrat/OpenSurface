@@ -310,10 +310,6 @@ def main() -> int:
     xosg_readme = (ROOT / "xOSG" / "README.md").read_text(encoding="utf-8")
     naked_shell_readme = (ROOT / "xOSG" / "Naked Shell" / "README.md").read_text(encoding="utf-8")
     dwsk_readme = (ROOT / "xOSG" / "DWSK" / "README.md").read_text(encoding="utf-8")
-    ig_readme = (ROOT / "xOSG" / "IG" / "README.md").read_text(encoding="utf-8")
-    identity_cataloger_readme = (
-        ROOT / "xOSG" / "IG" / "identity-atomic-cataloger" / "README.md"
-    ).read_text(encoding="utf-8")
     publication_identity = (
         "storefront, not a development dump" in root_readme
         and "OpenSurface Publishing Boundary" in (ROOT / "PUBLISHING.md").read_text(encoding="utf-8")
@@ -321,8 +317,6 @@ def main() -> int:
         and "AI instrumentation toolset" in xosg_readme
         and "natural-language command-line universal shell" in naked_shell_readme
         and "durable workspace" in dwsk_readme
-        and "Identity Gestalt" in ig_readme
-        and "identity-atomic-cataloger" in identity_cataloger_readme
     )
     checks.append(report(
         "publication_and_xosg_identity",
