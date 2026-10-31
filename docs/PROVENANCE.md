@@ -71,7 +71,7 @@ repository, commit, and original authorship remain recorded above.
 - State: accepted project identity as an AI instrumentation toolset
 - Accepted members:
   - Naked Shell
-  - DWSK | durable workspace
+  - Amorphous Durable AI Workspace
   - Synthetic Simulations
 - Implementation state: unstaged for each member
 - Authority: user decision for identity and publication family only

@@ -295,7 +295,7 @@ denials inspectable before real adapters or authority are introduced.
 It complements:
 
 - **Naked Shell**, the xOSG natural-language command-line universal shell;
-- **DWSK**, the xOSG durable workspace.
+- **Amorphous Durable AI Workspace**, the xOSG durable-workspace project.
 
 No runtime integration among these projects is claimed yet.
 
