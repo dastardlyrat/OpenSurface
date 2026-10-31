@@ -10,6 +10,24 @@ The effect is designed to be used late in the technique chain. It filters the
 image it receives; it does not generate lighting, trace rays, transport donor
 color, reconstruct GI, or add an illumination composite.
 
+**Current evidence:** the accepted V2.1 package passed 30/30 focused checks.
+Live application, output multiplication, proof tint, and the documented
+detail-then-denoise order were confirmed during development. Scene-wide
+quality, motion, performance, and ghosting remain content-dependent gates.
+
+## When To Use It
+
+Use this effect when visible instability remains in the completed image:
+
+- fine shimmer around texture and geometry detail;
+- unstable one- or two-pixel variation;
+- broader spatial noise or flickering gradients;
+- history-compatible noise that benefits from temporal settling.
+
+Do not use it to diagnose missing lighting or to replace a reconstruction
+stage. If the source is already clean, increasing denoise strength will remove
+real structure rather than reveal a hidden signal.
+
 ## Highlights
 
 - Five independently weighted noise-size bands.
@@ -55,6 +73,17 @@ For the Camera Obscura detail workflow:
 
 Effects placed after the denoiser can introduce new instability that this pass
 never sees.
+
+## Quick Proof
+
+1. Start with the documented defaults and `Combination Mode` set to
+   `Concurrent`.
+2. Select each Tiny through Extra Large view and identify the active size band.
+3. Select `Combined Noise Target`, then `Final Authority`.
+4. Inspect `Applied Difference (32x)` to confirm a real output correction.
+5. Enable `Show Applied Pixels Tint` and compare it with `Applied Tint Mask`.
+6. Set `Denoise Output Multiplier` to zero and confirm exact source output.
+7. Return `View` to `Denoised Image` before judging image quality.
 
 ## How It Works
 
@@ -114,18 +143,43 @@ may require Medium, Large, or Extra Large. The output multiplier supplies up to
 4x correction headroom after the bounded candidate has been selected; it does
 not improve discrimination by itself.
 
+## Tuning Order
+
+1. Find the unstable scale with the five size views.
+2. Disable unrelated size responses while isolating the problem.
+3. Tune `Noise Threshold` before increasing path strength.
+4. Check `Spatial Authority` and `Temporal Authority` separately.
+5. Use `Spatial Only` and `Temporal Only` to identify which path helps or harms.
+6. Return to `Concurrent`, or use `Agreement Only` when conservative consensus
+   is more important than coverage.
+7. Tune color/depth tolerances around silhouettes and thin geometry.
+8. Raise the output multiplier only after the candidate and authority are
+   correct.
+9. Test camera motion, animated objects, disocclusion, particles, foliage, UI,
+   and screen borders.
+
 ## Diagnostics
 
 The `View` control exposes the denoiser without feeding diagnostic colors back
-into history. Useful views include:
+into history.
 
-- individual Tiny through Extra Large targets;
-- Combined Scale Target;
-- Temporal Trust and spatial authority;
-- Final Authority;
-- Candidate Difference and Applied Difference at display-only 32x gain;
-- History Clamp Activity;
-- motion evidence.
+| View | What it answers |
+|---|---|
+| `Source Only` | What image entered the denoiser? |
+| `Tiny` through `Extra Large Noise` | Which frequency band is being admitted? |
+| `Combined Scale Target` | Where does any enabled spatial band identify noise? |
+| `Dominant Noise Size` | Which admitted band is strongest? |
+| `Active Scale Coverage` | How many bands contribute at this pixel? |
+| `Temporal Trust` | Is the matched history believable? |
+| `Temporal Authority` | How much temporal correction may act? |
+| `Spatial Authority` | How much current-frame correction may act? |
+| `Agreement Authority` | Do temporal and spatial candidates agree? |
+| `History Clamp Activity` | Where is history constrained to the current envelope? |
+| `Inferred Motion Offset` | Did history matching move away from center? |
+| `Final Authority` | What combined authority reaches output? |
+| `Candidate Difference (32x)` | How far would the selected candidate move the source? |
+| `Applied Difference (32x)` | How far did the final output actually move? |
+| `Applied Tint Mask` | Which pixels cross the proof-overlay threshold? |
 
 `Show Applied Pixels Tint` overlays a bright configurable color wherever the
 final correction exceeds the selected threshold. The tint belongs only to the
@@ -145,6 +199,19 @@ V2.1 still evaluates that scale's evidence. Exact per-scale workload bypass is
 reserved for a later optimization pass so it cannot silently alter the proven
 discriminator.
 
+## Failure Patterns
+
+| Symptom | Likely cause | First response |
+|---|---|---|
+| Denoiser appears inactive | No target, no authority, or correction is visually small | Inspect Combined Target, Final Authority, then Applied Difference |
+| Fine detail becomes soft | Tiny/Small response or spatial strength is too high | Isolate Spatial Only and lower the active small bands |
+| Motion leaves trails | Temporal authority is too permissive | Lower Temporal Strength and Ghosting Protection padding; inspect clamp activity |
+| Silhouettes bleed | Color or depth tolerance admits cross-edge support | Lower tolerances and verify usable game depth |
+| Broad gradients flatten | Large or Extra Large response is too strong | Reduce broad bands before changing the global multiplier |
+| Agreement Only is mostly inactive | Candidates differ or one path lacks authority | Inspect both path authorities, then Agreement Authority |
+| Tint is visible but final change is hard to see | Proof threshold is below perceptual visibility | Raise tint threshold or inspect Applied Difference |
+| Noise appears after this effect | A later technique introduces it | Move denoising later or reconsider chain order |
+
 ## Validation State
 
 The accepted V2.1 package passed 30 focused structural, numerical, package, and
@@ -157,10 +224,12 @@ retention, or ghosting behavior across every game and scene. Treat those as
 content-dependent checks, especially around thin geometry, foliage,
 disocclusions, bright contrast, and screen borders.
 
-## Removal
+## Removal And Recovery
 
 Disable the technique or remove the `camera_obscura_external` folder. The
-effect owns no external lighting or reconstruction state.
+effect owns no external lighting or reconstruction state. If a preset becomes
+unstable, restore the defaults, isolate Spatial Only and Temporal Only, and
+return to the last known-good technique order before increasing strength.
 
 ## Integrity And License
 

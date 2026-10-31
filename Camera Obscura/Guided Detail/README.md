@@ -1,14 +1,15 @@
-![Guided Detail diagnostic view showing admitted line and surface detail evidence](docs/images/guided-detail-diagnostic.png)
-
 # OpenSurface Camera Obscura Guided Detail
+
+![Guided Detail diagnostic view showing admitted line and surface detail evidence](docs/images/guided-detail-diagnostic.png)
 
 OpenSurface Camera Obscura Guided Detail is a production-staging shader unit for ReShade. It contains two paired effects that work from the same idea: do not enhance every contrast signal blindly; first ask whether the signal belongs to a coherent surface.
 
 This package is the first public-facing staging shape for the Camera Obscura guided tonal-detail lane.
 
-**Status:** a small source staging unit with a compile and visual test procedure.
-Read the effect and its diagnostics together; a preset name or capability label
-does not establish a successful runtime test on a particular system.
+**Status:** imported from the accepted public staging source with its compile
+and visual test procedure. Read the effect and its diagnostics together; a
+preset name or capability label does not establish a successful runtime test
+on a particular system.
 
 **Explore:** [The pair](#the-short-version) · [Package layout](#package-layout) ·
 [Shared method](#shared-method) · [Installation](#installation-for-local-reshade-testing) ·
@@ -29,6 +30,16 @@ In plain language:
 - **Guided Detail Reclamation** recovers stable fine detail without acting like a global sharpener.
 - **Guided Ink Lines** darkens admitted line, contour, and support-break evidence without acting like a blunt cartoon outline pass.
 
+## When To Use The Pair
+
+Use Guided Detail Reclamation when wanted texture looks soft but global
+sharpening exaggerates noise, silhouettes, or UI. Use Guided Ink Lines when
+stable object contours or same-surface breaks need deliberate dark emphasis.
+
+Neither effect is automatic scene understanding. Depth and neighborhood
+evidence can reject useful pixels, and permissive controls can admit unwanted
+ones. The diagnostic views are part of the workflow, not decorative extras.
+
 ## Why this exists
 
 Most sharpening and ink effects begin with a simple question:
@@ -46,7 +57,7 @@ A normal sharpener can make noise, UI, silhouettes, and texture chatter louder. 
 ## Package layout
 
 ```text
-OpenSurface/CameraObscura/GuidedDetail/
+Camera Obscura/Guided Detail/
 ├─ effects/
 │  ├─ OSCO_GuidedDetailReclamation.fx
 │  └─ OSCO_GuidedInkLines.fx

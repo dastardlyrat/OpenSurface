@@ -1,29 +1,82 @@
-# Camera Obscura Stabilized Detail Cache V1
+# Camera Obscura Stabilized Detail Cache
 
-Date: 2026-10-30
-Imported into OpenSurface: 2026-10-31
+**Version 1 | Carry chosen detail across the same ReShade frame**
 
-Status: local validation 19/19; user-reported live compile and visual pass on
-2026-10-31; loading-transition, high-memory-scene, and long-motion evidence
-remain separately unrecorded
+Stabilized Detail Cache separates *where detail is chosen* from *where detail
+is finally applied*. Capture extracts and stores a bounded signed RGB residual
+from an already reclaimed and denoised image. Reapply restores that residual
+after intervening color, tone, or image effects.
 
-## Purpose
+The cache is not temporal accumulation. It does not preserve detail across
+frames, loading screens, or game sessions. Its freshness guard admits only a
+Capture that ran earlier in the same frame.
 
-This package captures stabilized signed detail, permits unrelated effects to
-run, then reapplies that same-frame detail afterward.
+**Current evidence:** 19/19 source-package checks passed, followed by a
+user-reported clean compile and visual pass on 2026-10-31. Loading-transition,
+high-memory-scene, and long-motion results remain separately unrecorded.
 
-Confirmed intended order:
+## When To Use It
 
-1. Detail Reclamation.
-2. External Image Denoiser.
-3. `Camera Obscura - 1 Stabilized Detail Capture V1`.
-4. Other effects.
-5. `Camera Obscura - 2 Stabilized Detail Reapply V1`.
+Use the cache when:
 
-Both techniques live in one effect file and share one cache texture. Capture
-writes only the cache and does not alter the displayed image. Reapply rejects a
-cache whose frame stamp does not match the current frame and rejects frame zero.
-Enable or disable both techniques together.
+- wanted detail is selected and stabilized early in the chain;
+- later effects soften or obscure that chosen structure;
+- you want final control over how much of the stored residual returns.
+
+Do not use it as:
+
+- an image-history buffer;
+- a motion-compensated temporal store;
+- a substitute for denoising or detail selection;
+- a dynamic memory manager.
+
+## Intended Order
+
+```text
+Guided Detail Reclamation
+        |
+External Image Denoiser
+        |
+Camera Obscura - 1 Stabilized Detail Capture V1
+        |
+Intervening color, tone, or image effects
+        |
+Camera Obscura - 2 Stabilized Detail Reapply V1
+```
+
+Both techniques live in one effect file and share one `RGBA16F` texture.
+Capture writes only that texture and does not alter the displayed image.
+Reapply rejects frame zero and any cache whose freshness stamp does not match
+the current frame. Enable, disable, install, and remove the pair together.
+
+## Install
+
+Keep the component layout intact:
+
+```text
+Stabilized Detail Cache/
+|-- api/
+|   `-- CAMERA_OBSCURA_API_StabilizedDetailCache.fxh
+`-- effects/
+    `-- CAMERA_OBSCURA_StabilizedDetailCacheV1.fx
+```
+
+1. Copy the component into a stable location beneath ReShade's shader tree.
+2. Add its `effects` directory to ReShade's effect search paths.
+3. Keep the sibling `api` directory in place so the relative include resolves.
+4. Keep the installation's existing `ReShade.fxh`; it is not bundled here.
+5. Reload ReShade and enable both numbered techniques in the intended order.
+
+## Quick Proof
+
+1. Select `Cache Freshness` in Reapply. A valid same-frame Capture is green.
+2. Select `Stored Signed Detail`. Neutral zero is middle gray; darker and
+   lighter departures are signed residuals.
+3. Select `Applied Difference (32x)` to prove that Reapply changes the image.
+4. Set `Stored Detail Reapply Strength` to zero and confirm an exact source
+   return.
+5. Enable `Show Reapplied Detail Tint` and compare it with `Reapply Tint Mask`.
+6. Return to `Reapplied Image` before judging final quality.
 
 ## Cache Format
 
@@ -43,7 +96,7 @@ resolution, other effects, driver, and runtime allocation behavior.
 | 2560x1440 | 28.1 MiB | 7.0 MiB |
 | 3840x2160 | 63.3 MiB | 15.8 MiB |
 
-## Memory Profile
+## Memory And Resolution
 
 ReShade FX cannot query available VRAM and then dynamically allocate or release
 this texture as game-world demand changes. The cache is allocated when the
@@ -56,9 +109,10 @@ Use exactly one compile-time profile:
 
 Change the global preprocessor definition and reload ReShade to change the
 allocation. Do not install separate full- and half-resolution effect copies;
-both would allocate.
+both would allocate. Half resolution reduces memory to one quarter but uses
+linear sampling during Reapply and cannot preserve the same spatial precision.
 
-## Algorithm
+## How It Works
 
 Capture builds a depth- and color-admitted four-neighbor local base from the
 already reclaimed and denoised image. The signed residual between source and
@@ -70,30 +124,76 @@ Missing, stale, disabled, zero-strength, and zero-detail paths return the
 current source exactly.
 
 The half-float alpha stamp is a lightweight ordering guard, not an unbounded
-frame identity. It repeats every 1024 frames. It is designed for an enabled
-Capture/Reapply pair running every frame; disable both techniques together.
+frame identity. It repeats every 1024 frames. The pair is designed to run every
+frame, with Capture before Reapply. It is not evidence of long-duration frame
+identity.
 
-## First Live Gate
+## Controls
 
-1. Confirm both techniques compile.
-2. Put Capture immediately after the external denoiser.
-3. Put Reapply after the intervening effects.
-4. Select `Cache Freshness`; it must be green.
-5. Inspect `Stored Signed Detail`, then `Applied Difference (32x)`.
-6. Set Reapply Strength to zero and confirm exact source behavior.
-7. Enable the proof tint and confirm it agrees with `Reapply Tint Mask`.
-8. Test loading transitions and a high-memory game-world scene before accepting
-   the full-resolution profile.
+| Control | What it changes | Conservative direction |
+|---|---|---|
+| `Captured Detail Radius` | Neighborhood width used to separate detail from its local base | Smaller isolates finer structure |
+| `Captured Detail Threshold` | Minimum signed RGB residual admitted to storage | Higher stores only stronger detail |
+| `Captured Detail Gain` | Residual scale before storage | Lower stores less |
+| `Stored Detail Limit` | Per-channel bound applied before storage | Lower contains extreme edges |
+| `Capture Color Tolerance` | Same-region color support | Lower rejects more cross-edge support |
+| `Use Capture Depth Rejection` | Enables depth-aware neighbor rejection | Keep enabled with usable depth |
+| `Capture Depth Tolerance` | Allowed linear-depth separation | Lower protects silhouettes more strongly |
+| `Enable Stored Detail Reapply` | Master Reapply output switch | Off returns the current source |
+| `Stored Detail Reapply Strength` | Scale applied to the cached residual | `1.0` restores the stored amount |
+| `Reapplied Detail Limit` | Independent final per-channel bound | Lower contains aggressive strength |
+| `Show Reapplied Detail Tint` | Display-only proof overlay | Off for production |
 
-## Rollback
+The capture and reapply limits are intentionally independent. A high capture
+gain cannot bypass the storage limit, and a high reapply strength cannot bypass
+the applied limit.
 
-Disable both techniques or remove the effect. No Twin Lantern, Detail
-Reclamation, or External Denoiser source is modified.
+## Diagnostic Views
+
+| View | What it proves |
+|---|---|
+| `Reapplied Image` | Final production result, optionally with proof tint |
+| `Source Before Reapply` | Exact image entering the Reapply technique |
+| `Stored Signed Detail` | Cached residual around middle-gray zero |
+| `Cache Freshness` | Green means Capture and Reapply agree on this frame |
+| `Applied Difference (32x)` | Magnified absolute visible change |
+| `Applied Signed Detail` | Final bounded signed contribution around middle gray |
+| `Reapply Tint Mask` | Pixels crossing the proof-tint threshold |
+
+## Tuning Order
+
+1. Establish a green freshness view.
+2. Tune radius and threshold while watching `Stored Signed Detail`.
+3. Protect silhouettes with color and depth tolerances.
+4. Set storage gain and limit.
+5. Tune Reapply strength while watching `Applied Signed Detail`.
+6. Use the applied limit to contain bright or dark edge excursions.
+7. Test at the final technique order, resolution, and game-world load.
+
+## Failure Patterns
+
+| Symptom | Likely cause | First response |
+|---|---|---|
+| Freshness is dark | Capture is disabled, below Reapply, or not running this frame | Enable both and restore numbered order |
+| Stored detail is flat gray | Threshold is too high, gain is zero, or the source has little residual | Lower threshold, then inspect gain |
+| Reapply appears inactive | Stale cache, zero strength, or tiny contribution | Check Freshness, then `Applied Difference (32x)` |
+| Halos return after Reapply | Capture crossed a color/depth boundary or limits are high | Tighten tolerances and lower stored/applied limits |
+| Memory pressure rises | Full-resolution `RGBA16F` allocation is too expensive for the scene | Test the half-resolution compile-time profile |
+| Detail looks soft at half resolution | Downsampled storage lost spatial precision | Return to full resolution if memory permits |
+
+## Removal And Recovery
+
+Disable both techniques or remove this component's `effects` and `api` files.
+No Guided Detail, External Denoiser, Lazara, or Twin Lantern source is modified.
+If the pair is misordered, restore the last known-good technique order before
+changing detail controls.
 
 ## Evidence Boundary
 
 Static validation and memory arithmetic do not prove driver allocation success,
-available VRAM, runtime stability, visual quality, or live performance.
+available VRAM, runtime stability, visual quality, ordering across every ReShade
+configuration, or live performance. Test loading transitions and a high-memory
+scene before accepting the full-resolution profile.
 
 ## Integrity
 
@@ -103,4 +203,4 @@ The repository root `SOURCE_MANIFEST.sha256` records the active shader sources.
 
 Published under the MIT License. Copyright and source provenance are retained
 through file-level SPDX metadata, the repository authorship ledger, and the
-original package hash.
+original package hash recorded in the provenance ledger.
