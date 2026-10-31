@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 dastardlyrat and OpenSurface contributors
+// SPDX-License-Identifier: MIT
+
 #ifndef CAMERA_OBSCURA_API_STABILIZED_DETAIL_CACHE_FXH
 #define CAMERA_OBSCURA_API_STABILIZED_DETAIL_CACHE_FXH
 

@@ -464,6 +464,6 @@ Important points:
 
 - `ReShade.fxh` is not bundled in this staging unit.
 - ReShade runtime/framework files are external dependencies.
-- The local reference copy of `ReShade.fxh` inspected during staging carried `SPDX-License-Identifier: CC0-1.0`.
+- The local reference copy of `ReShade.fxh` inspected during staging carried the SPDX identifier `CC0-1.0`.
 - If a future package vendors any ReShade framework file, preserve that upstream file's license/SPDX notice exactly.
 

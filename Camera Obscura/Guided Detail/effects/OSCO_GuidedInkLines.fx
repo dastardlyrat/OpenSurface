@@ -1,4 +1,5 @@
 // OpenSurface Camera Obscura Guided Ink Lines
+// SPDX-FileCopyrightText: 2026 OpenSurface Camera Obscura contributors
 // SPDX-License-Identifier: MIT
 // Requires ReShade runtime headers; ReShade.fxh is intentionally not vendored here.
 

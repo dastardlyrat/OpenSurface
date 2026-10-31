@@ -1,0 +1,38 @@
+# SPDX-FileCopyrightText: 2026 dastardlyrat and OpenSurface contributors
+# SPDX-License-Identifier: MIT
+
+version = 1
+
+[[annotations]]
+path = [
+  ".gitattributes",
+  ".gitignore",
+  "AUTHORS.md",
+  "LICENSE",
+  "LICENSES/*.txt",
+  "LICENSING.md",
+  "README.md",
+  "SOURCE_MANIFEST.sha256",
+  "THIRD_PARTY_NOTICES.md",
+  "Camera Obscura/README.md",
+  "Camera Obscura/Stabilized Detail Cache/**",
+  "Camera Obscura/Lazara Color Revival/**",
+  "Naked Shell/**",
+  "docs/**",
+  "tools/**"
+]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2026 dastardlyrat and OpenSurface contributors"
+SPDX-License-Identifier = "MIT"
+
+[[annotations]]
+path = "Camera Obscura/Guided Detail/**"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2026 OpenSurface Camera Obscura contributors"
+SPDX-License-Identifier = "MIT"
+
+[[annotations]]
+path = "Camera Obscura/Lazara Color Revival/docs/images/*.png"
+precedence = "override"
+SPDX-FileCopyrightText = "2026 dastardlyrat"
+SPDX-License-Identifier = "LicenseRef-Documentation-Screenshot"

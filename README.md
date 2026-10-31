@@ -1,8 +1,15 @@
 # OpenSurface
 
-OpenSurface is a development repository for inspectable ReShade effects. It
-keeps effect families separate while giving them one place to evolve, share
-tests, and document runtime evidence.
+OpenSurface is the license-adhering publication end of our work. Publication
+here means that authorship remains visible, every source keeps a traceable
+license chain, upstream obligations continue forward, and original work is
+released under the most permissive compatible terms we can responsibly grant.
+
+Original OpenSurface software is published under the MIT License unless an
+individual file states otherwise. MIT continues the license already established
+by Guided Detail while preserving copyright and license notices for downstream
+users. External frameworks, third-party material, and documentation screenshots
+retain their own stated terms and are never silently relicensed.
 
 ## Repository map
 
@@ -56,8 +63,10 @@ the old RM umbrella or unrelated ray-marching headers.
 
 ## Naked Shell
 
-`Naked Shell` is intentionally reserved as the second OpenSurface family. It
-contains no effect implementation yet.
+Naked Shell is the OpenSurface natural-language command-line universal shell.
+It is a separate software family from Camera Obscura. Its product identity is
+accepted here; implementation, command grammar, execution authority, and
+platform contracts have not yet been staged in this repository.
 
 ## Development rules
 
@@ -89,8 +98,22 @@ compile or visual test.
 3. Keep each component's `effects`, `header`, and `api` folders together.
 4. Reload ReShade and review compile diagnostics before enabling effects.
 
-## Provenance and licensing
+## License-adhering publication
 
 See [docs/PROVENANCE.md](docs/PROVENANCE.md) for exact source revisions and
-truth states. Licensing is recorded per component in [licenses/README.md](licenses/README.md);
-there is no silent repository-wide relicensing.
+truth states. See [AUTHORS.md](AUTHORS.md), [LICENSE](LICENSE),
+[LICENSING.md](LICENSING.md), and
+[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for authorship, continuation,
+and dependency boundaries.
+
+Publication checks require:
+
+- a recognized SPDX identifier on active source;
+- a file-level copyright holder or a precise repository annotation;
+- an exact license text in `LICENSES/`;
+- source provenance and revision identity;
+- explicit treatment for material outside the software grant;
+- validation that licensing metadata survives packaging and refactoring.
+
+The repository follows the current [REUSE specification](https://reuse.software/spec/)
+for machine-readable copyright and licensing metadata.

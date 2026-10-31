@@ -6,7 +6,7 @@ These OpenSurface Camera Obscura shaders are intended to compile and run in ReSh
 
 `ReShade.fxh` and the ReShade runtime/framework are not bundled in this staging unit. They are expected to be provided by the user's ReShade installation or shader include path.
 
-If future public packages vendor any ReShade framework file, preserve that file's upstream SPDX/license notice exactly. The reference copy of `ReShade.fxh` inspected for this notice carries `SPDX-License-Identifier: CC0-1.0`.
+If future public packages vendor any ReShade framework file, preserve that file's upstream SPDX/license notice exactly. The reference copy of `ReShade.fxh` inspected for this notice carries the SPDX identifier `CC0-1.0`.
 
 ## Compatibility posture
 

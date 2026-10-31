@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 dastardlyrat and OpenSurface contributors
+# SPDX-License-Identifier: MIT
+
 from __future__ import annotations
 
 import hashlib
@@ -127,6 +130,64 @@ def main() -> int:
         "lazara_minimal_header_capsule",
         len(lazara_headers) == 2,
         f"headers={len(lazara_headers)}",
+    ))
+
+    license_tag = "SPDX-License-" + "Identifier: MIT"
+    source_license_gaps = [
+        relative(path)
+        for path in files
+        if "SPDX-FileCopyrightText:" not in path.read_text(encoding="utf-8")
+        or license_tag not in path.read_text(encoding="utf-8")
+    ]
+    checks.append(report(
+        "source_license_metadata",
+        not source_license_gaps,
+        "all active shader sources carry copyright and MIT SPDX metadata"
+        if not source_license_gaps
+        else f"missing={source_license_gaps}",
+    ))
+
+    required_license_files = [
+        ROOT / "LICENSE",
+        ROOT / "LICENSING.md",
+        ROOT / "LICENSES" / "MIT.txt",
+        ROOT / "LICENSES" / "LicenseRef-Documentation-Screenshot.txt",
+        ROOT / "AUTHORS.md",
+        ROOT / "THIRD_PARTY_NOTICES.md",
+        ROOT / "REUSE.toml",
+    ]
+    missing_license_files = [relative(path) for path in required_license_files if not path.is_file()]
+    checks.append(report(
+        "publication_license_files",
+        not missing_license_files,
+        "canonical license, authorship, dependency, and REUSE files present"
+        if not missing_license_files
+        else f"missing={missing_license_files}",
+    ))
+
+    reuse_text = (ROOT / "REUSE.toml").read_text(encoding="utf-8")
+    screenshot_boundary = (
+        "Camera Obscura/Lazara Color Revival/docs/images/*.png" in reuse_text
+        and "LicenseRef-Documentation-Screenshot" in reuse_text
+        and "does not grant rights to reuse underlying" in
+        (ROOT / "LICENSES" / "LicenseRef-Documentation-Screenshot.txt").read_text(encoding="utf-8")
+    )
+    checks.append(report(
+        "screenshot_license_boundary",
+        screenshot_boundary,
+        "documentation screenshot is excluded from the MIT software grant",
+    ))
+
+    root_readme = (ROOT / "README.md").read_text(encoding="utf-8")
+    naked_readme = (ROOT / "Naked Shell" / "README.md").read_text(encoding="utf-8")
+    publication_identity = (
+        "license-adhering publication end" in root_readme
+        and "natural-language command-line universal shell" in naked_readme
+    )
+    checks.append(report(
+        "publication_and_naked_shell_identity",
+        publication_identity,
+        "publication purpose and Naked Shell identity are explicit",
     ))
 
     balanced = all(text.count("{") == text.count("}") for text in (path.read_text(encoding="utf-8") for path in files))

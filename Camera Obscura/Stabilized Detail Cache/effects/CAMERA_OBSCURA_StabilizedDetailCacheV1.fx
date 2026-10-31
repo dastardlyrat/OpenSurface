@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 dastardlyrat and OpenSurface contributors
+// SPDX-License-Identifier: MIT
+
 #include "ReShade.fxh"
 #include "../api/CAMERA_OBSCURA_API_StabilizedDetailCache.fxh"
 

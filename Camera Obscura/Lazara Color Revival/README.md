@@ -58,3 +58,10 @@ supersedes it.
 The retained historical design record is in `docs/SOURCE_HISTORY.md`. Statements
 inside it refer to the earlier source paths and identifiers unless explicitly
 updated here.
+
+## License
+
+Published under the MIT License as a continuation of project-owned Lazara work.
+The original repository, revision, and renamed refactor boundary remain in the
+OpenSurface provenance ledger. The documentation screenshot is not included in
+the MIT software grant.

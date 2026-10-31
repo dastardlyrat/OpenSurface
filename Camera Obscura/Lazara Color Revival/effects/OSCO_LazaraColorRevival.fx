@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 dastardlyrat and OpenSurface contributors
+// SPDX-License-Identifier: MIT
+
 #include "ReShade.fxh"
 #include "../header/OSCO_LazaraColorRevival_Common.fxh"
 #include "../header/OSCO_LazaraColorRevival_DebugVisibility.fxh"

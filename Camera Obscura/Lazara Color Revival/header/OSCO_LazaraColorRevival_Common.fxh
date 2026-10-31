@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 dastardlyrat and OpenSurface contributors
+// SPDX-License-Identifier: MIT
+
 #ifndef OSCO_LAZARA_COLOR_REVIVAL_COMMON_FXH
 #define OSCO_LAZARA_COLOR_REVIVAL_COMMON_FXH
 

@@ -1,7 +1,8 @@
 # Camera Obscura
 
 This folder contains the Camera Obscura effects currently admitted to the
-OpenSurface development repository.
+OpenSurface publication repository. Active source is MIT licensed with
+component provenance retained.
 
 ## Current effects
 

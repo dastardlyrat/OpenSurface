@@ -9,7 +9,7 @@ helper-compiler evidence. This is not a live ReShade runtime attestation.
 
 `python -B tools/validate_repository.py`
 
-Result: 9/9 pass.
+Result: 13/13 pass.
 
 The checks cover:
 
@@ -22,10 +22,28 @@ The checks cover:
 - three exact source revisions in the provenance ledger;
 - source-manifest integrity.
 
+The publication validator also requires inline SPDX copyright and MIT license
+identifiers on every active shader source, canonical license texts, authorship
+and third-party notices, and a non-software license boundary for screenshots.
+
+## REUSE compliance
+
+Tool: `reuse` 6.3.0
+
+Specification: REUSE 3.3
+
+Result: compliant.
+
+- covered files with copyright information: 30/30;
+- covered files with licensing information: 30/30;
+- bad, deprecated, missing, unused, or malformed licenses: zero;
+- used licenses: `MIT` and `LicenseRef-Documentation-Screenshot`.
+
 ## Import parity
 
-- Guided Detail component files match revision
-  `68850554650abe22cca029a65f7a807b6b3b3047` byte for byte.
+- Guided Detail behavior source originates at revision
+  `68850554650abe22cca029a65f7a807b6b3b3047`; only SPDX publication metadata was
+  added after import.
 - Stabilized Detail Cache effect and API match package SHA-256
   `5B10BF3A81BD1A00AFCC379D6DCC00D18748FFCEAEC16093578A59EE197C3B4D`.
 

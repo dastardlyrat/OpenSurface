@@ -98,3 +98,9 @@ available VRAM, runtime stability, visual quality, or live performance.
 ## Integrity
 
 The repository root `SOURCE_MANIFEST.sha256` records the active shader sources.
+
+## License
+
+Published under the MIT License. Copyright and source provenance are retained
+through file-level SPDX metadata, the repository authorship ledger, and the
+original package hash.

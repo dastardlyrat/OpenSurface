@@ -6,8 +6,10 @@ Date: 2026-10-31
 
 - Source: `https://github.com/dastardlyrat/OpenSurface-CameraObscura-GuidedDetail`
 - Revision: `68850554650abe22cca029a65f7a807b6b3b3047`
-- Import state: byte-preserved source and component documentation
+- Import state: source imported from the exact revision; SPDX copyright
+  metadata was added for publication without changing shader behavior
 - Authority: accepted public staging source
+- License continuation: existing MIT grant retained
 
 ## Stabilized Detail Cache
 
@@ -18,6 +20,8 @@ Date: 2026-10-31
 - Live evidence: user-reported compile and visual pass on 2026-10-31
 - Unresolved evidence: loading-transition, high-memory-scene, and long-motion
   checks were not separately asserted in that report
+- License continuation: project-owned source expressly published under MIT on
+  2026-10-31 by owner direction
 
 ## Lazara Color Revival
 
@@ -33,8 +37,15 @@ to a dedicated color-input header and diagnostic header. Legacy `OCCULT_RM_67`,
 source. This is a new implementation state and requires its own live compile
 and visual regression proof before it supersedes the public Lazara build.
 
+License continuation: the previously unlicensed project-owned Lazara source is
+expressly published under MIT on 2026-10-31 by owner direction. The source
+repository, commit, and original authorship remain recorded above.
+
 ## Naked Shell
 
 - Source: none
-- State: reserved empty family
-- Authority: folder placement only; no generated architecture is accepted
+- State: accepted project identity as the natural-language command-line
+  universal shell; implementation remains unstaged
+- Authority: user decision for identity and publication family only
+- License continuation: future original source defaults to MIT unless a file
+  states another SPDX license expression

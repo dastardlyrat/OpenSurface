@@ -1,9 +1,10 @@
+// SPDX-FileCopyrightText: 2026 OpenSurface Camera Obscura contributors
+// SPDX-License-Identifier: MIT
+
 #ifndef OSCO_GUIDED_DETAIL_DEBUG_VISIBILITY_FXH
 #define OSCO_GUIDED_DETAIL_DEBUG_VISIBILITY_FXH 1
 
 // OpenSurface Camera Obscura Guided Detail debug visibility helpers.
-// SPDX-License-Identifier: MIT
-
 float OSCO_DebugVisibilityPowNonNegative(float baseValue, float exponentValue)
 {
     return pow(max(baseValue, 0.0), exponentValue);

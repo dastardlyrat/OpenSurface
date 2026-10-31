@@ -1,8 +1,10 @@
+// SPDX-FileCopyrightText: 2026 OpenSurface Camera Obscura contributors
+// SPDX-License-Identifier: MIT
+
 #ifndef OSCO_GUIDED_DETAIL_COMMON_FXH
 #define OSCO_GUIDED_DETAIL_COMMON_FXH 1
 
 // OpenSurface Camera Obscura Guided Detail common runtime capsule.
-// SPDX-License-Identifier: MIT
 // Purpose: minimal dependency surface for Guided Detail Reclamation and Guided Ink Lines.
 
 texture2D OSCO_RM_ColorTex : COLOR;

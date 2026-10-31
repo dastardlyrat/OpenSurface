@@ -1,0 +1,14 @@
+OpenSurface Documentation Screenshot Notice
+
+The screenshot file identified with this LicenseRef is included only to
+document and compare software output.
+
+Copyright in the screenshot capture and comparison composition is retained by
+its contributor. Copyright, trademarks, characters, environments, interface
+elements, and other content originating from the depicted game remain with
+their respective rights holders.
+
+The OpenSurface MIT License does not grant rights to reuse underlying
+third-party game content. No additional license is granted by OpenSurface for
+that content. Any reuse must be separately authorized or permitted by
+applicable law.
