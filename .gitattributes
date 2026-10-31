@@ -1,0 +1,14 @@
+* text=auto eol=lf
+
+*.fx text eol=lf
+*.fxh text eol=lf
+*.md text eol=lf
+*.csv text eol=lf
+*.json text eol=lf
+*.py text eol=lf
+*.sha256 text eol=lf
+
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary

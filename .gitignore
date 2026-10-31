@@ -1,0 +1,12 @@
+# ReShade runtime and preset state
+*.ini
+*.log
+*.bak
+
+# Generated validation state
+__pycache__/
+*.pyc
+
+# Operating-system metadata
+.DS_Store
+Thumbs.db

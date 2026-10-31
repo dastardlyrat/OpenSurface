@@ -1,0 +1,103 @@
+{
+  "scope": "Camera Obscura Stabilized Detail Cache V1",
+  "truth_state": "static/API compiler/package validation only; complete ReShade compile, allocation, ordering, and live visual proof pending",
+  "passed": 19,
+  "failed": 0,
+  "checks": [
+    {
+      "name": "local_include_closure",
+      "passed": true,
+      "detail": "zero missing local includes"
+    },
+    {
+      "name": "detail_cache_only_no_gi_pipeline",
+      "passed": true,
+      "detail": "no transport, donor, reconstruction, indirect, or composite symbols"
+    },
+    {
+      "name": "fully_initialized_flat_records",
+      "passed": true,
+      "detail": "capture=5/5; reapply=6/6"
+    },
+    {
+      "name": "bounded_operator_interface",
+      "passed": true,
+      "detail": "visible controls=14"
+    },
+    {
+      "name": "single_shared_rgba16f_cache",
+      "passed": true,
+      "detail": "textures=1; samplers=1; rgba16f=1"
+    },
+    {
+      "name": "compile_time_memory_profile_only",
+      "passed": true,
+      "detail": "one cache uses a compile-time divisor; dynamic VRAM adaptation is not claimed"
+    },
+    {
+      "name": "ordered_capture_and_reapply_techniques",
+      "passed": true,
+      "detail": "techniques=['CAMERA_OBSCURA_StabilizedDetailCaptureV1', 'CAMERA_OBSCURA_StabilizedDetailReapplyV1']; passes=['CaptureStabilizedDetail', 'ReapplyStabilizedDetail']"
+    },
+    {
+      "name": "documented_intervening_effect_order",
+      "passed": true,
+      "detail": "Capture precedes other effects and Reapply follows them"
+    },
+    {
+      "name": "border_admission_before_texture_reads",
+      "passed": true,
+      "detail": "out-of-bounds taps return before color or depth reads"
+    },
+    {
+      "name": "same_frame_stamp_gate",
+      "passed": true,
+      "detail": "Reapply rejects frame zero and nonmatching modulo frame stamps; repetition limit is documented"
+    },
+    {
+      "name": "synthetic_capture_reapply_bounds",
+      "passed": true,
+      "detail": "5000 signed capture/reapply cases remain bounded"
+    },
+    {
+      "name": "synthetic_exact_reapply_bypass",
+      "passed": true,
+      "detail": "disabled, stale, and zero-authority paths return source exactly"
+    },
+    {
+      "name": "memory_budget_arithmetic",
+      "passed": true,
+      "detail": "profiles=6; 64 bits per cached pixel"
+    },
+    {
+      "name": "separate_from_active_camera_obscura",
+      "passed": true,
+      "detail": "active detail-cache files=0"
+    },
+    {
+      "name": "fresh_compatibility_compile",
+      "passed": true,
+      "detail": "FXC /Gec pass"
+    },
+    {
+      "name": "fresh_strict_compile",
+      "passed": true,
+      "detail": "FXC /Ges /WX pass"
+    },
+    {
+      "name": "frozen_ver_0001_unchanged",
+      "passed": true,
+      "detail": "baseline files=79; current files=79"
+    },
+    {
+      "name": "package_manifest",
+      "passed": true,
+      "detail": "entries=5"
+    },
+    {
+      "name": "zip_byte_parity",
+      "passed": true,
+      "detail": "entries=6"
+    }
+  ]
+}
