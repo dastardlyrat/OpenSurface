@@ -307,16 +307,17 @@ def main() -> int:
     ))
 
     root_readme = (ROOT / "README.md").read_text(encoding="utf-8")
-    naked_readme = (ROOT / "Naked Shell" / "README.md").read_text(encoding="utf-8")
+    xosg_readme = (ROOT / "xOSG" / "README.md").read_text(encoding="utf-8")
     publication_identity = (
         "storefront, not a development dump" in root_readme
         and "OpenSurface Publishing Boundary" in (ROOT / "PUBLISHING.md").read_text(encoding="utf-8")
-        and "natural-language command-line universal shell" in naked_readme
+        and "expert Overlay System Gestalt" in xosg_readme
+        and "AI instrumentation toolset" in xosg_readme
     )
     checks.append(report(
-        "publication_and_naked_shell_identity",
+        "publication_and_xosg_identity",
         publication_identity,
-        "publication purpose and Naked Shell identity are explicit",
+        "publication purpose and xOSG identity are explicit",
     ))
 
     balanced = all(text.count("{") == text.count("}") for text in (path.read_text(encoding="utf-8") for path in files))

@@ -1,7 +1,7 @@
 # OpenSurface
 
 OpenSurface is the public home for finished, inspectable tools developed through
-the Camera Obscura and Naked Shell projects.
+the Camera Obscura and xOSG projects.
 
 This repository is a storefront, not a development dump. Each published unit
 must be independently understandable, installable, removable, licensed, and
@@ -21,7 +21,7 @@ continue forward; publication never silently replaces them.
 | [Guided Detail](Camera%20Obscura/Guided%20Detail/) | Same-surface detail reclamation and guided line emphasis | Published source with diagnostic workflow |
 | [Stabilized Detail Cache](Camera%20Obscura/Stabilized%20Detail%20Cache/) | Captures bounded signed detail and restores it later in the chain | Live compile and visual pass recorded |
 | [Lazara Color Revival](Camera%20Obscura/Lazara%20Color%20Revival/) | Recovers muted source color or deliberately removes it | Refactored candidate; live regression still required |
-| [Naked Shell](Naked%20Shell/) | Natural-language command-line universal shell | Product identity reserved; implementation not published |
+| [xOSG](xOSG/) | **expert Overlay System Gestalt**, an AI instrumentation toolset | Product identity reserved; implementation not published |
 
 ## Camera Obscura
 

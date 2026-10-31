@@ -13,7 +13,7 @@ the authorship, source revision, and notices carried by each admitted project.
 - **Lazara Color Revival:** project-owned Lazara source is now expressly
   published under MIT by owner direction. The renamed refactor preserves the
   source repository and revision in the provenance ledger.
-- **Naked Shell:** future original implementation defaults to MIT unless a file
+- **xOSG:** future original implementation defaults to MIT unless a file
   records a different SPDX expression.
 - **ReShade:** external dependency, not bundled. Its own licenses continue to
   govern it.

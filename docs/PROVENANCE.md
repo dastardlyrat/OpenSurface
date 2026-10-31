@@ -65,11 +65,11 @@ License continuation: the previously unlicensed project-owned Lazara source is
 expressly published under MIT on 2026-10-31 by owner direction. The source
 repository, commit, and original authorship remain recorded above.
 
-## Naked Shell
+## xOSG | expert Overlay System Gestalt
 
 - Source: none
-- State: accepted project identity as the natural-language command-line
-  universal shell; implementation remains unstaged
+- State: accepted project identity as an AI instrumentation toolset;
+  implementation remains unstaged
 - Authority: user decision for identity and publication family only
 - License continuation: future original source defaults to MIT unless a file
   states another SPDX license expression
