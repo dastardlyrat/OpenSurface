@@ -1,0 +1,8 @@
+include *.md *.json
+include validate.py
+recursive-include schemas *.json
+recursive-include templates *.md *.json
+recursive-include examples *.py
+recursive-include tests *.py
+recursive-include docs *.md
+global-exclude __pycache__ *.py[cod]
