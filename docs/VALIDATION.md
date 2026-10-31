@@ -9,7 +9,7 @@ helper-compiler evidence. This is not a live ReShade runtime attestation.
 
 `python -B tools/validate_repository.py`
 
-Result: 13/13 pass.
+Result: 14/14 pass.
 
 The checks cover:
 
@@ -24,7 +24,8 @@ The checks cover:
 
 The publication validator also requires inline SPDX copyright and MIT license
 identifiers on every active shader source, canonical license texts, authorship
-and third-party notices, and a non-software license boundary for screenshots.
+and third-party notices, a non-software license boundary for screenshots, and
+local README image resolution without unavailable GitHub attachments.
 
 ## REUSE compliance
 
@@ -34,8 +35,8 @@ Specification: REUSE 3.3
 
 Result: compliant.
 
-- covered files with copyright information: 30/30;
-- covered files with licensing information: 30/30;
+- covered files with copyright information: 31/31;
+- covered files with licensing information: 31/31;
 - bad, deprecated, missing, unused, or malformed licenses: zero;
 - used licenses: `MIT` and `LicenseRef-Documentation-Screenshot`.
 

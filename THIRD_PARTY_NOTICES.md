@@ -15,5 +15,6 @@ the OpenSurface MIT License does not replace them.
 
 ## Documentation screenshots
 
-The Lazara comparison image contains game imagery and is excluded from the MIT
-software grant. See `LICENSES/LicenseRef-Documentation-Screenshot.txt`.
+Guided Detail and Lazara documentation images contain game imagery and are
+excluded from the MIT software grant. See
+`LICENSES/LicenseRef-Documentation-Screenshot.txt`.

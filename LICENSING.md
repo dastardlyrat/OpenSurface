@@ -15,8 +15,8 @@ the authorship, source revision, and notices carried by each admitted project.
 - **ReShade:** external dependency, not bundled. Its own licenses continue to
   govern it.
 - **Documentation screenshots:** excluded from the MIT software grant because
-  they may contain third-party game imagery. Their repository annotation uses
-  `LicenseRef-Documentation-Screenshot`.
+  they may contain third-party game imagery. Guided Detail and Lazara images
+  use `LicenseRef-Documentation-Screenshot`.
 
 Canonical license texts are stored under `LICENSES/`. `REUSE.toml` supplies
 machine-readable annotations for documentation and other files that cannot

@@ -1,9 +1,9 @@
 OpenSurface Documentation Screenshot Notice
 
-The screenshot file identified with this LicenseRef is included only to
-document and compare software output.
+Screenshot files identified with this LicenseRef are included only to document
+and compare software output.
 
-Copyright in the screenshot capture and comparison composition is retained by
+Copyright in each screenshot capture or comparison composition is retained by
 its contributor. Copyright, trademarks, characters, environments, interface
 elements, and other content originating from the depicted game remain with
 their respective rights holders.

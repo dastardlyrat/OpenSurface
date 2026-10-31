@@ -36,3 +36,9 @@ path = "Camera Obscura/Lazara Color Revival/docs/images/*.png"
 precedence = "override"
 SPDX-FileCopyrightText = "2026 dastardlyrat"
 SPDX-License-Identifier = "LicenseRef-Documentation-Screenshot"
+
+[[annotations]]
+path = "Camera Obscura/Guided Detail/docs/images/*.png"
+precedence = "override"
+SPDX-FileCopyrightText = "2026 dastardlyrat"
+SPDX-License-Identifier = "LicenseRef-Documentation-Screenshot"

@@ -1,4 +1,4 @@
-<img width="2560" height="1440" alt="XCom2 2026-06-26 14-33-54_585" src="https://github.com/user-attachments/assets/3f346622-f96e-4efb-9a3a-bf788af50e57" />
+![Guided Detail diagnostic view showing admitted line and surface detail evidence](docs/images/guided-detail-diagnostic.png)
 
 # OpenSurface Camera Obscura Guided Detail
 

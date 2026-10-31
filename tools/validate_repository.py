@@ -7,6 +7,7 @@ import hashlib
 import re
 import sys
 from pathlib import Path
+from urllib.parse import unquote
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -168,6 +169,7 @@ def main() -> int:
     reuse_text = (ROOT / "REUSE.toml").read_text(encoding="utf-8")
     screenshot_boundary = (
         "Camera Obscura/Lazara Color Revival/docs/images/*.png" in reuse_text
+        and "Camera Obscura/Guided Detail/docs/images/*.png" in reuse_text
         and "LicenseRef-Documentation-Screenshot" in reuse_text
         and "does not grant rights to reuse underlying" in
         (ROOT / "LICENSES" / "LicenseRef-Documentation-Screenshot.txt").read_text(encoding="utf-8")
@@ -176,6 +178,33 @@ def main() -> int:
         "screenshot_license_boundary",
         screenshot_boundary,
         "documentation screenshot is excluded from the MIT software grant",
+    ))
+
+    readmes = sorted(ROOT.rglob("README.md"))
+    missing_images: list[str] = []
+    attachment_images: list[str] = []
+    markdown_image_pattern = re.compile(r"!\[[^\]]*\]\(([^)]+)\)")
+    html_image_pattern = re.compile(r'<img\b[^>]*\bsrc="([^"]+)"', re.IGNORECASE)
+    for readme in readmes:
+        readme_text = readme.read_text(encoding="utf-8")
+        references = markdown_image_pattern.findall(readme_text)
+        references += html_image_pattern.findall(readme_text)
+        for reference in references:
+            if "github.com/user-attachments/" in reference:
+                attachment_images.append(f"{relative(readme)} -> {reference}")
+                continue
+            if reference.startswith(("http://", "https://")):
+                continue
+            image_path = (readme.parent / unquote(reference)).resolve()
+            if not image_path.is_file():
+                missing_images.append(f"{relative(readme)} -> {reference}")
+    image_links_pass = not missing_images and not attachment_images
+    checks.append(report(
+        "local_readme_images",
+        image_links_pass,
+        "all local README images resolve; no GitHub attachment dependency"
+        if image_links_pass
+        else f"missing={missing_images}; attachments={attachment_images}",
     ))
 
     root_readme = (ROOT / "README.md").read_text(encoding="utf-8")

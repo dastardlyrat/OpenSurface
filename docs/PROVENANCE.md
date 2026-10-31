@@ -10,6 +10,11 @@ Date: 2026-10-31
   metadata was added for publication without changing shader behavior
 - Authority: accepted public staging source
 - License continuation: existing MIT grant retained
+- Original README image: external GitHub attachment returned 404 on 2026-10-31
+- Replacement image: locally preserved Guided Detail diagnostic screenshot,
+  `Camera Obscura/Guided Detail/docs/images/guided-detail-diagnostic.png`
+- Replacement image SHA-256:
+  `C60ABB434D48FA2925DC1EB617D8335493FF6B49B0391F19F58E873999678AF3`
 
 ## Stabilized Detail Cache
 
