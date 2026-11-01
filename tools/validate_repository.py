@@ -315,6 +315,16 @@ def main() -> int:
     synthetic_simulations_readme = (
         ROOT / "xOSG" / "Synthetic Simulations" / "README.md"
     ).read_text(encoding="utf-8")
+    synthetic_failure_root = (
+        ROOT / "xOSG" / "Synthetic Simulations" / "defunct-experiments" /
+        "failure" / "llm-prompt-hardening-modular-kit-v1-5-candidate"
+    )
+    synthetic_failure_readme = (
+        synthetic_failure_root / "README.md"
+    ).read_text(encoding="utf-8")
+    synthetic_failure_artifact = (
+        synthetic_failure_root / "artifact.json"
+    ).read_text(encoding="utf-8")
     publication_identity = (
         "storefront, not a development dump" in root_readme
         and "OpenSurface Publishing Boundary" in (ROOT / "PUBLISHING.md").read_text(encoding="utf-8")
@@ -338,6 +348,21 @@ def main() -> int:
         "publication_and_xosg_identity",
         publication_identity,
         "publication purpose and xOSG identity are explicit",
+    ))
+
+    synthetic_failure_record = (
+        "failed and defunct" in synthetic_failure_readme
+        and "42/43 tests" in synthetic_failure_readme
+        and "no package-level license grant" in synthetic_failure_readme
+        and "D88D0740CD50011F3EC05C6645329D3C6A766755B0AA7A6B005335CEDE13FFE6"
+        in synthetic_failure_readme
+        and '"raw_archive_included": false' in synthetic_failure_artifact
+        and '"package_license_grant_found": false' in synthetic_failure_artifact
+    )
+    checks.append(report(
+        "synthetic_defunct_failure_record",
+        synthetic_failure_record,
+        "sanitized failure disposition, evidence, and exclusion are explicit",
     ))
 
     balanced = all(text.count("{") == text.count("}") for text in (path.read_text(encoding="utf-8") for path in files))

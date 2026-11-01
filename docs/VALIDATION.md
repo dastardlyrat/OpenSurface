@@ -1,6 +1,6 @@
 # Validation Record
 
-Date: 2026-10-31
+Date: 2026-11-01
 
 Truth state: local structural, integrity, compatibility-compiler, and strict
 helper-compiler evidence. This is not a live ReShade runtime attestation.
@@ -9,7 +9,7 @@ helper-compiler evidence. This is not a live ReShade runtime attestation.
 
 `python -B tools/validate_repository.py`
 
-Result: 16/16 pass.
+Result: 17/17 pass.
 
 The checks cover:
 
@@ -23,6 +23,7 @@ The checks cover:
 - balanced source blocks;
 - four exact source revisions in the provenance ledger;
 - source-manifest integrity;
+- sanitized Synthetic Simulations failure-record identity and exclusion state;
 - local README image and document-link resolution.
 
 The publication validator also requires inline SPDX copyright and MIT license
@@ -38,8 +39,8 @@ Specification: REUSE 3.3
 
 Result: compliant.
 
-- covered files with copyright information: 66/66;
-- covered files with licensing information: 66/66;
+- covered files with copyright information: 68/68;
+- covered files with licensing information: 68/68;
 - bad, deprecated, missing, unused, or malformed licenses: zero;
 - used licenses: `MIT` and `LicenseRef-Documentation-Screenshot`.
 
@@ -166,3 +167,27 @@ while the manifest records
 Neither candidate contains a license grant. Both remain excluded from the
 public tree pending correction, ownership and licensing confirmation, and a
 deeper privacy review.
+
+### Defunct prompt-hardening candidate
+
+`llm_prompt_hardening_modular_kit_v1_5_candidate.zip` was inspected in private
+intake after the user classified it as a failed experiment.
+
+- SHA-256:
+  `D88D0740CD50011F3EC05C6645329D3C6A766755B0AA7A6B005335CEDE13FFE6`
+- ZIP result: 79 members, CRC clean, zero unsafe paths.
+- Manifest result: 78/78 listed members matched; zero missing, mismatched, or
+  unlisted members other than the manifest itself.
+- Retained package claim: 43/43 tests passed on Linux x86-64 with Python
+  3.12.14 before archive construction.
+- Fresh result: 42/43 tests passed on Windows with Python 3.14.4.
+- Failure: `test_existing_build_requires_explicit_replace` expected mode
+  `0644` after atomic replacement and observed `0666`.
+- License result: no candidate-level license grant or SPDX expression was
+  found. A nested vendor record's MIT statement does not license the candidate
+  as a whole.
+
+The public tree contains only a generated failure summary and an artifact
+receipt. It does not contain the raw candidate, nested archives, DOCX, prompts,
+sources, assembler, or tests. Embedded candidate instructions were treated as
+artifact content and were not executed as instructions.

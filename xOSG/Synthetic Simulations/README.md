@@ -25,6 +25,7 @@ operating system, grant authority, or declare a task successful.
 | Fresh source-suite result | 31/31 tests passed on 2026-10-31 |
 | Memory-instrument candidates | Two private packages inspected |
 | Atomized-package integrity | Blocked: 14/15 manifest hashes match |
+| Defunct experiments | One sanitized failure record published |
 | Model inference | None |
 | Workload launch | Denied |
 | Execution authority | None |
@@ -45,6 +46,16 @@ Synthetic Simulations currently has two evidence-backed lanes:
 
 Neither lane treats a prompt package, declared identity, model response, or
 successful simulation as authority or real-world task completion.
+
+## Defunct Experiments
+
+Failed experiments are retained as bounded learning records, not as dormant
+implementations. Raw packages, nested evidence bundles, and unlicensed source
+remain outside the storefront.
+
+Current record:
+
+- [LLM Prompt Hardening Modular Kit Candidate 1.5](defunct-experiments/failure/llm-prompt-hardening-modular-kit-v1-5-candidate/) - user-designated failure; archive integrity passed, but a fresh Windows run passed 42/43 tests and reproduced a POSIX-mode portability defect. The candidate also lacks a package-level license grant.
 
 ## Why Simulate
 

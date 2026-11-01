@@ -130,3 +130,14 @@ repository, commit, and original authorship remain recorded above.
   `3795c4ace9df9b07a61eab310d1c217f7f83571eba77f5cb51a353b562a3f900`,
   not the manifest's
   `1e5540eeea3f52d3148ef4cb2a2d6b9db62b6915080ba8193690a7d364a939df`
+- Defunct experiment: `llm_prompt_hardening_modular_kit_v1_5_candidate.zip`
+- Defunct archive SHA-256:
+  `D88D0740CD50011F3EC05C6645329D3C6A766755B0AA7A6B005335CEDE13FFE6`
+- Disposition authority and date: user-designated failure on 2026-11-01
+- Defunct intake result: ZIP CRC and archive paths passed; all 78 manifest
+  entries matched; a fresh Windows/Python 3.14.4 run passed 42 of 43 tests
+- Reproduced failure: atomic replacement mode test required POSIX `0644` and
+  observed `0666` on Windows
+- Publication state: generated summary and machine-readable receipt only; raw
+  archive and all candidate members remain excluded because the candidate has
+  no package-level license grant
