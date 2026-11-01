@@ -55,7 +55,7 @@ remain outside the storefront.
 
 Current record:
 
-- [LLM Prompt Hardening Modular Kit Candidate 1.5](defunct-experiments/failure/llm-prompt-hardening-modular-kit-v1-5-candidate/) - user-designated failure intended for cleaned-source publication; archive integrity passed, but a fresh Windows run passed 42/43 tests and reproduced a POSIX-mode portability defect. Source import is pending license confirmation and sanitation.
+- [LLM Prompt Hardening Modular Kit Candidate 1.5](defunct-experiments/failure/llm-prompt-hardening-modular-kit-v1-5-candidate/) - user-designated failed experiment with sanitized source published under MIT in this private repository; archive integrity passed, but a fresh Windows run passed 42/43 tests and reproduced a POSIX-mode portability defect.
 
 ## Why Simulate
 

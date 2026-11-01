@@ -156,7 +156,7 @@ def validate_publication_boundary() -> tuple[bool, str]:
     missing = [relative(path) for path in required_package_files if not path.is_file()]
     passed = not denied_paths and not private_hits and not missing
     detail = (
-        "clean public tree; denoiser package is independently installable"
+        "clean publication tree; denoiser package is independently installable"
         if passed
         else f"denied_paths={denied_paths}; private_hits={private_hits}; missing={missing}"
     )
@@ -325,6 +325,11 @@ def main() -> int:
     synthetic_failure_artifact = (
         synthetic_failure_root / "artifact.json"
     ).read_text(encoding="utf-8")
+    synthetic_failure_source = synthetic_failure_root / "source"
+    synthetic_source_readme = (
+        synthetic_failure_source / "README.md"
+    ).read_text(encoding="utf-8")
+    synthetic_source_manifest = synthetic_failure_source / "MANIFEST.sha256"
     publication_identity = (
         "storefront, not a development dump" in root_readme
         and "OpenSurface Publishing Boundary" in (ROOT / "PUBLISHING.md").read_text(encoding="utf-8")
@@ -353,18 +358,26 @@ def main() -> int:
     synthetic_failure_record = (
         "failed and defunct" in synthetic_failure_readme
         and "42/43 tests" in synthetic_failure_readme
-        and "no package-level license grant" in synthetic_failure_readme
+        and "published under the MIT License" in synthetic_failure_readme
         and "D88D0740CD50011F3EC05C6645329D3C6A766755B0AA7A6B005335CEDE13FFE6"
         in synthetic_failure_readme
         and '"raw_archive_included": false' in synthetic_failure_artifact
-        and '"package_license_grant_found": false' in synthetic_failure_artifact
+        and '"source_included": true' in synthetic_failure_artifact
+        and '"publication_license": "MIT"' in synthetic_failure_artifact
+        and '"repository_visibility": "private"' in synthetic_failure_artifact
         and '"intent": "publish-cleaned-defunct-experiment"'
         in synthetic_failure_artifact
+        and (synthetic_failure_source / "LICENSE").is_file()
+        and synthetic_source_manifest.is_file()
+        and "35/36" in synthetic_source_readme
+        and not (synthetic_failure_source / "vendor").exists()
+        and not (synthetic_failure_source / "sources").exists()
+        and not (synthetic_failure_source / "parent").exists()
     )
     checks.append(report(
         "synthetic_defunct_failure_record",
         synthetic_failure_record,
-        "sanitized failure disposition, evidence, and exclusion are explicit",
+        "sanitized failed source, MIT license, private visibility, and exclusions are explicit",
     ))
 
     balanced = all(text.count("{") == text.count("}") for text in (path.read_text(encoding="utf-8") for path in files))

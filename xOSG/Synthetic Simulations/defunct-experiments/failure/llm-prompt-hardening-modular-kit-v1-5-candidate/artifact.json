@@ -33,9 +33,13 @@
   },
   "publication": {
     "intent": "publish-cleaned-defunct-experiment",
-    "source_included": false,
+    "source_included": true,
     "raw_archive_included": false,
-    "package_license_grant_found": false,
-    "state": "summary-only-pending-license-and-sanitation"
+    "package_license_grant_found_in_original": false,
+    "publication_license": "MIT",
+    "publication_license_authority": "explicit-user-direction",
+    "publication_license_date": "2026-11-01",
+    "repository_visibility": "private",
+    "state": "sanitized-source-published-private-repository"
   }
 }
