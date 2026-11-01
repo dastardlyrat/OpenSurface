@@ -1,138 +1,30 @@
 # Amorphous Durable AI Workspace
 
-**A durable working record for AI projects that need to survive the conversation.**
+**A Python development kit for durable records, transactional journaling, verified checkpoints, and quorum recovery.**
 
-Ongoing AI work accumulates state: what has been observed, what was decided, what changed, what remains unfinished, and where the supporting material lives. Amorphous Durable AI Workspace provides storage and recovery mechanics for that record, so applications can return to an inspectable state instead of reconstructing a project from recollection.
+The implementation is **Durable Workspace Development Kit (DWSK) 0.1.1**. It provides a Python API and the `dwsk` command for creating a local workspace, storing canonical records, verifying its journal, publishing snapshots, and recovering consistent state.
 
-The aim is practical continuity. A person and an agent should have something they can return to, examine, and pick up: the current work, its recorded changes, and a recoverable checkpoint. Within **xOSG — expert Overlay System Gestalt**, this is the persistence layer for that kind of AI instrumentation.
+The kit combines a SQLite runtime database with three snapshot representations and an explicit recovery rule. State mutations and their journal events commit together. Checkpoints are verified before publication. Recovery requires agreement between eligible representations and the published manifest.
 
-The current implementation is **Durable Workspace Development Kit (DWSK) 0.1.1**: a Python library and CLI with transactional records, a hash-chained journal, three snapshot representations, and quorum recovery.
+**Guide:** [Capabilities](#capabilities) · [Installation](#installation-from-source) · [Example](#a-complete-storage-and-recovery-example) · [API](#python-api) · [CLI](#command-line-reference) · [Storage](#storage-layout) · [Publication](#checkpoint-publication) · [Recovery](#verification-and-recovery) · [Validation](#validation-record) · [Project files](#project-files)
 
-**Guide:** [Purpose](#why-continuity-needs-a-working-record) · [The mill](#how-this-fits-the-mill) · [Record model](#a-record-model-for-an-agent-application) · [Quick start](#start-from-this-repository) · [API](#the-api-at-a-glance) · [Storage](#what-lives-on-disk) · [Failure behavior](#failure-behavior-worth-designing-around) · [Recovery](#recover-deliberately) · [Validation](#what-has-been-validated) · [Project map](#project-map-and-contribution-entry-points)
+## Capabilities
 
-## Why continuity needs a working record
+- Initialize an isolated workspace at a configured filesystem path.
+- Store, retrieve, replace, and delete records by key.
+- Commit each mutation and its hash-chained journal event in one SQLite transaction.
+- Canonicalize supported values using the DWSK-CJ-1 data profile.
+- Verify database integrity, journal sequence/hashes, and agreement between replayed events and current record values.
+- Create SQLite, JSONL, and typed XML representations of one consistent logical state.
+- Publish complete snapshot generations with a manifest of file sizes, hashes, and a logical digest.
+- Inspect snapshot eligibility and recover from at least two agreeing valid representations.
+- Coordinate Windows pointer promotion with a workspace-specific named mutex, bounded wait, and bounded replacement retry.
 
-A project can span many conversations, tools, and revisions. The conversation may contain an instruction, an interpretation of that instruction, a proposed action, a rejected approach, and an observation that changes the plan. A useful continuation needs to preserve those differences. A summary that collapses them can leave the next session with a confident account of work that was only proposed.
+The runtime has no third-party dependencies. Source installation uses setuptools as its build backend.
 
-The workspace gives an application somewhere to retain the working record deliberately. It can keep the source reference alongside the observation, the decision alongside its authority, and the unfinished action alongside its actual status. The next session can inspect those records and their supporting material before continuing.
+## Installation from source
 
-This also changes the handoff. Instead of asking a new session to infer everything from a compressed narrative, an application can provide an explicit current objective, an index of relevant records, the last verified state, and unresolved questions. The quality of that handoff still depends on what the application records and retrieves. DWSK makes those supplied records persistent and recoverable.
-
-## How this fits the mill
-
-The larger workflow is intake, interpretation, planning, action, validation, and continuation. Each stage produces something worth retaining:
-
-| Stage | Record worth carrying forward | Application responsibility |
-| --- | --- | --- |
-| Intake | Source identity, original location, capture time, supplied request | Obtain material through an authorized capture path and preserve originals |
-| Interpretation | Assumptions, uncertainty, competing readings | Keep inference distinguishable from observation |
-| Planning | Intended outcome, bounded steps, dependencies | Establish scope and required approval |
-| Action | Inputs, attempts, outputs, errors | Enforce permissions and record what actually executed |
-| Validation | Expected result, observed result, supporting evidence | Apply meaningful checks and retain failures |
-| Continuation | Current state, pending commitments, next action | Select the right records for the next session |
-
-DWSK sits beneath this workflow. Its journal records storage mutations; a higher-level action ledger records the meaning of the work. Those are different records. A successful `set` proves that a value was committed through the API, not that the real-world action described by the value happened.
-
-```mermaid
-flowchart LR
-    A[Human and agent work] --> B[Application-owned record adapter]
-    B --> C[SQLite records and journal]
-    C --> D[Verified checkpoint]
-    D --> E[SQLite / JSONL / XML]
-    E --> F[Manifest and recovery quorum]
-    F --> G[Recovered workspace]
-```
-
-The adapter in that diagram belongs to the integrating application. This release exposes storage operations through Python and the CLI; it does not ship the conversation capture or agent-side adapter.
-
-## What you can build with it
-
-Use one workspace per project to retain records such as:
-
-| Application record | What it can carry |
-| --- | --- |
-| Working state | Current phase, goals, open questions, unfinished commitments, next actions |
-| Conversation index | Captured message records or references to original conversation material |
-| Evidence ledger | Source locations, artifact hashes, observations, and uncertainty |
-| Decision and action ledger | Proposals, authorization records, attempts, outcomes, and verification results |
-| Agent definition or atomic catalog | Profile elements, affect/agency definitions, constraints, and source references |
-| Handoff record | The state and evidence another session needs to resume the work |
-
-These are application-level uses, not built-in schemas. The integrating application supplies conversation capture, record structure, retrieval, permissions, and interpretation. Agent-layer software owns the semantics, composition, and enforcement of agent definitions. DWSK preserves the supplied canonical records and checks their consistency.
-
-That distinction matters for agency. A stored permission record needs an application that interprets and enforces it. An action marked complete needs supporting execution evidence. Persistence gives those records a durable place; authorization and truth remain decisions above the storage layer. See the [module boundary](MODULE_BOUNDARY.md).
-
-## A record model for an agent application
-
-Record keys are a useful place to establish application conventions. A project might use `work/current`, `sources/document-001`, `observations/0001`, `decisions/0001`, `actions/0001`, and `handoffs/current`. DWSK treats these as opaque keys; the slashes do not create filesystem directories or enforce relationships.
-
-For example, an application-defined action record could look like this:
-
-```json
-{
-  "id": "action-0001",
-  "kind": "document.review",
-  "status": "proposed",
-  "authority_ref": "decisions/0001",
-  "input_refs": ["sources/document-001"],
-  "output_refs": [],
-  "verification": {
-    "status": "not-run",
-    "evidence_refs": []
-  }
-}
-```
-
-A handoff can point to the records that need attention rather than flattening their contents into a single account:
-
-```json
-{
-  "objective": "Complete the document review",
-  "current_phase": "source-checking",
-  "working_state_ref": "work/current",
-  "open_action_refs": ["actions/0001"],
-  "unresolved_questions": ["Which source supports the disputed statement?"],
-  "next_action": "Inspect sources/document-001 before drafting a conclusion"
-}
-```
-
-These examples are suggested application data, not normative DWSK schemas. The application must resolve references, validate status transitions, enforce authorization, and decide whether an outcome has enough evidence. If it needs a queryable record index, it must maintain that index or provide its own retrieval layer. The public API currently retrieves records by known key; it does not include semantic search, record subscriptions, or a conversation browser.
-
-### Agentic atomic decomposition and affect
-
-An atomic catalog can make an agent's declared operating elements explicit: purpose, attention, affective expression, initiative, constraints, and authority boundaries. A workspace can retain those elements, their source references, and application-defined revision or composition records. A later session can retrieve a declared profile and the evidence for how it was assembled.
-
-The decomposition, selection, composition, and evaluation rules belong to the agent application or cataloging system. DWSK's canonical profile determines which values can be stored; it does not determine what an agent element means or how it should govern behavior. The application also decides which version of a profile is accepted. `LATEST` is never a substitute for that decision.
-
-This makes the relationship practical: the catalog describes intended operating elements, the application governs their use, and the durable workspace retains the supplied definitions and working records. Instrumentation can then compare declarations with recorded observations without treating a stored assertion as proof of conduct.
-
-## The working cycle
-
-1. **Initialize** a project workspace.
-2. **Record** changes through the API or CLI. Each accepted mutation and its journal event commit together.
-3. **Verify** the runtime database, journal chain, and agreement between current values and replayed events.
-4. **Checkpoint** one consistent logical state into SQLite, JSONL, and typed XML.
-5. **Inspect** a published generation and its manifest before choosing it for recovery.
-6. **Recover** into a new or empty directory when at least two eligible representations agree with the published manifest digest.
-
-For example, a document-review agent can retain its current phase, source references, decisions, and outstanding questions. Before a handoff, its application creates and verifies a checkpoint. A later session retrieves that application state and decides how to resume. DWSK supplies the durable state operations; connecting ChatGPT or another agent to them requires an adapter. Automatic conversation logging and agent orchestration are outside this release.
-
-### A session-to-session handoff
-
-A bounded integration can follow this pattern:
-
-1. At session start, read a known handoff key and an application-maintained index of relevant records.
-2. Check that cited artifacts and approvals still apply; retrieve their sources through the application's authorized tools.
-3. Perform work within the agreed scope and record attempts and observations as they occur.
-4. Update current state and pending commitments. Keep failed attempts and superseded decisions identifiable in application records.
-5. Verify the workspace, create a checkpoint, and inspect that generation.
-6. Give the next session the record references and evidence it needs, together with the checkpoint identity when useful.
-
-Every individual `set` or `delete` has its own transaction. A sequence of calls is not exposed as one application-level batch transaction. If several records must become authoritative together, the integrating application needs an explicit publication/acceptance convention; it must not infer all-or-nothing behavior across separate calls.
-
-## Start from this repository
-
-**Requires Python 3.11 or later.** The tested platform is Windows with Python 3.14. The runtime uses only Python's standard library; source installation uses setuptools as its build backend.
+**Python 3.11 or later is required.** Windows with Python 3.14 is the tested platform. The declared Python minimum is not a claim that every supported interpreter or operating system has been exercised.
 
 From the OpenSurface repository root, in PowerShell:
 
@@ -140,78 +32,125 @@ From the OpenSurface repository root, in PowerShell:
 cd xOSG/amorphous-durable-ai-workspace
 python -m venv .venv
 .\.venv\Scripts\python.exe -m pip install .
+$dwskPython = (Resolve-Path .\.venv\Scripts\python.exe).Path
+$dwskCli = (Resolve-Path .\.venv\Scripts\dwsk.exe).Path
 ```
 
-The Python distribution is named `durable-workspace-development-kit`, its import is `durable_workspace`, and its command is `dwsk`. The project name is Amorphous Durable AI Workspace. Built wheels are not committed to this source folder; the build inventory records the original distribution hashes.
+The distribution name is `durable-workspace-development-kit`; the import is `durable_workspace`; the executable is `dwsk`. Built binaries are held outside this source repository. Their identities and hashes are retained in [docs/build/ARTIFACTS.json](docs/build/ARTIFACTS.json).
 
-Save this as `workspace_example.py` and run it with the environment's Python. Use fresh paths for the first run: initialization refuses to replace an existing workspace.
+Keep example databases and snapshots outside the source checkout. These commands create a fresh scratch directory and retain the environment paths above:
+
+```powershell
+$dwskExample = Join-Path ([System.IO.Path]::GetTempPath()) ("dwsk-kit-" + [guid]::NewGuid().ToString("N"))
+New-Item -ItemType Directory -Path $dwskExample
+Set-Location $dwskExample
+```
+
+## A complete storage and recovery example
+
+Save the following as `workspace_example.py` in the scratch directory. Initialization and recovery use fresh paths; repeating the script against existing output is deliberately refused.
 
 ```python
 from durable_workspace import DurableWorkspace
 
 workspace = DurableWorkspace.init("./demo-workspace")
-workspace.set("work/state", {
-    "goal": "Review the supplied documents",
-    "phase": "review",
-    "open_questions": ["Which source supports the current conclusion?"],
-    "next_action": "Inspect the cited source",
-    "authority": "review-only",
-})
-workspace.set("decisions/0001", {
-    "decision": "Retain original documents separately",
-    "status": "recorded",
-    "basis": "Preserve exact source bytes and link their hashes",
-})
+settings = {
+    "name": "sample-project",
+    "enabled": True,
+    "retry_limit": 3,
+    "labels": ["example", "local"],
+}
+
+workspace.set("project/settings", settings)
+workspace.set("project/state", {"phase": "ready", "completed_steps": 0})
+if workspace.get("project/settings") != settings:
+    raise RuntimeError("Stored settings differ")
 
 before = workspace.verify()
 snapshot = workspace.checkpoint()
+inspection = DurableWorkspace.inspect_snapshot(snapshot)
+if inspection["manifest_digest_matches_quorum"] is not True:
+    raise RuntimeError("Checkpoint has no manifest-matching quorum")
+
 restored = DurableWorkspace.recover(snapshot, "./demo-recovered")
+if restored.get("project/settings") != settings:
+    raise RuntimeError("Recovered settings differ")
+if restored.verify() != before:
+    raise RuntimeError("Recovered verification report differs")
 
-if restored.get("work/state") != workspace.get("work/state"):
-    raise RuntimeError("Recovered working state differs")
-if restored.verify()["logical_digest"] != before["logical_digest"]:
-    raise RuntimeError("Recovered logical digest differs")
-
-print(restored.get("work/state"))
+print(restored.get("project/settings"))
 print(snapshot)
 ```
 
-The `authority` and `status` fields above are illustrative application data. They do not configure an authorization engine.
+Run it, then inspect the original workspace with the installed CLI:
 
 ```powershell
-.\.venv\Scripts\python.exe workspace_example.py
-.\.venv\Scripts\dwsk.exe get ./demo-workspace work/state
-.\.venv\Scripts\dwsk.exe verify ./demo-workspace
-.\.venv\Scripts\dwsk.exe checkpoint ./demo-workspace
+& $dwskPython ./workspace_example.py
+& $dwskCli get ./demo-workspace project/settings
+& $dwskCli verify ./demo-workspace
+& $dwskCli checkpoint ./demo-workspace
 ```
 
-The CLI also exposes `init`, `set`, `delete`, `verify-snapshot`, and `recover`. The Python API avoids shell-quoting problems for structured values.
+The example writes two records, verifies them, creates a checkpoint, inspects its quorum, and reconstructs a separate workspace. Keys such as `project/settings` are opaque record keys; the slash does not create a directory.
 
-## The API at a glance
+## Python API
 
-| Operation | Result | Useful boundary |
+| Operation | Returns | Behavior |
 | --- | --- | --- |
-| `DurableWorkspace.init(root)` | A new workspace handle | Refuses an existing runtime database |
-| `DurableWorkspace(root)` | A handle for the configured path | Constructing a handle does not initialize or verify storage |
-| `set(key, value)` | The committed `record.set` journal event | Canonicalizes the value and commits state plus event together |
-| `get(key)` | The current canonical value | Missing keys raise `KeyError` |
-| `delete(key)` | A committed `record.delete` event | Deletion remains journaled; deleting an absent key also records an event |
-| `verify()` | Runtime integrity, digest and count report | Rejects journal or replay disagreement |
-| `checkpoint()` | The published generation's path | A late failure may retain a complete generation without promoting its pointer |
-| `inspect_snapshot(path)` | Representation, quorum and manifest report | Inspect the report fields, not just whether the function returned |
-| `recover(snapshot, target)` | A recovered workspace handle | Requires an eligible quorum and a new or empty target |
+| `DurableWorkspace.init(root)` | Workspace handle | Creates the database and snapshot directory; refuses an existing runtime database |
+| `DurableWorkspace(root)` | Workspace handle | Selects a path; construction alone does not initialize or verify it |
+| `set(key, value)` | Committed journal event | Canonicalizes the value and atomically commits the record mutation plus event |
+| `get(key)` | Current record value | Retrieves by known key; a missing record raises `KeyError` |
+| `delete(key)` | Committed journal event | Deletes the current record and journals the operation; an absent key also produces a delete event |
+| `verify()` | Runtime verification report | Checks SQLite integrity, the journal chain, and replay/value consistency |
+| `checkpoint()` | Published generation path | Writes and publishes one verified logical bundle |
+| `inspect_snapshot(path)` | Inspection report | Reports representation validity, quorum, and manifest agreement |
+| `recover(snapshot, target)` | Recovered workspace handle | Requires an eligible quorum and an absent or empty target |
 
-Mutation events include a sequence, event ID, UTC timestamp, kind, payload, previous-event hash, and event hash. The payload identifies the key and revision; a set event also retains the value. The API's event timestamp is the storage event's time, not independent proof of when an external action happened. Record external observation times separately when they matter.
+Mutation events carry `seq`, `event_id`, `timestamp_utc`, `kind`, `payload`, `previous_event_sha256`, and `event_sha256`. The payload records the key and revision; a set event also contains its value. Journal order is established by sequence and hash links. The event timestamp records the storage event's time.
 
-## What lives on disk
+Each `set` or `delete` is one transaction. Several separate calls do not become a single batch transaction. A revision belongs to the stored record's mutation behavior; use the journal when inspecting history rather than treating a current record as a complete history.
 
-A runtime workspace has a layout like this:
+A successful runtime verification reports `ok`, `logical_digest`, `event_count`, and `record_count`. Snapshot inspection separately reports representation validity, `quorum_digest`, `quorum_kinds`, and `manifest_digest_matches_quorum`.
+
+## Command-line reference
+
+| Command | Operation |
+| --- | --- |
+| `dwsk init <root>` | Initialize a workspace |
+| `dwsk set <root> <key> <json_value>` | Store a canonical JSON value |
+| `dwsk get <root> <key>` | Print the current value as JSON |
+| `dwsk delete <root> <key>` | Delete a record and journal the operation |
+| `dwsk verify <root>` | Verify runtime integrity and logical consistency |
+| `dwsk checkpoint <root>` | Publish a snapshot and print its generation path |
+| `dwsk verify-snapshot <generation>` | Print representation/quorum inspection results |
+| `dwsk recover <generation> <target>` | Recover into a new or empty directory |
+
+Commands return zero on successful execution and two for operational errors handled by the CLI. `verify-snapshot` prints an inspection report: successful execution of that command does not mean every representation is valid or that recovery quorum exists. Read the report fields.
+
+Use the Python API for structured values when shell JSON quoting would be inconvenient. All record values must satisfy the same canonical profile through either interface.
+
+## Canonical data profile
+
+DWSK-CJ-1 supports:
+
+- null and Booleans;
+- Unicode strings normalized to NFC;
+- signed 64-bit integers;
+- arrays whose order is preserved;
+- objects with string keys, sorted after NFC normalization.
+
+Booleans and integers retain distinct canonical representations. Floating-point values, out-of-range integers, nonstring object keys, unsupported Python containers, and object keys that collide after NFC normalization are rejected.
+
+Represent nonintegral values with a documented string format when needed. Retain original binary/document bytes separately if exact byte identity matters; a record can store their hash and location. Canonicalization deliberately transforms supported text into its canonical form.
+
+## Storage layout
 
 ```text
-project-workspace/
+workspace/
   workspace.sqlite3
-  workspace.sqlite3-wal       # SQLite-managed sidecar when present
-  workspace.sqlite3-shm       # SQLite-managed sidecar when present
+  workspace.sqlite3-wal       # SQLite-managed, when present
+  workspace.sqlite3-shm       # SQLite-managed, when present
   snapshots/
     LATEST
     generation-name/
@@ -221,131 +160,106 @@ project-workspace/
       snapshot.xml
 ```
 
-The runtime database contains workspace metadata, current records with revisions, and journal events. A published generation contains the three logical representations and the manifest that identifies their sizes, hashes, and logical digest. The formats share one logical bundle, allowing verification across representations rather than trusting a preferred file extension.
+The database contains workspace metadata, current records with revisions, and the journal. SQLite uses WAL and `synchronous=FULL`. A mutation's record update and event commit in the same transaction; failure during the transaction rolls both back.
 
-During publication, a generation-specific staging directory and an owned temporary pointer can also exist. They are intermediate state, not additional accepted generations. Do not treat a copied live SQLite database or a staging directory as equivalent to a verified checkpoint. Use the checkpoint and inspection operations, and keep the SQLite-managed sidecars under SQLite's control.
+A checkpoint exports one consistent logical bundle. SQLite, JSONL, and typed XML contain that same logical state in different representations. The manifest identifies their sizes, SHA-256 hashes, and shared logical digest. These copies occupy the same workspace storage location and are not independent off-device backups.
 
-### Human-readable control files
+During publication, a generation-specific `.staging-*` directory and an owned `.LATEST-*.tmp` pointer may exist. They are intermediate state, not additional accepted snapshots. Do not substitute a copied live database or a staging directory for a verified checkpoint. Keep SQLite sidecars under SQLite's control.
 
-The included templates provide another surface for people to inspect:
+## Checkpoint publication
 
-| Template | Intended use |
+The publication sequence writes the representations, syncs their files, writes and syncs the manifest last, and atomically promotes the generation directory. It then writes and syncs a unique temporary pointer and atomically replaces `LATEST`.
+
+On Windows, construction remains parallel. Pointer promotion is guarded by a named mutex scoped to the current user, session, and normalized resolved workspace path. Acquisition waits up to five seconds in the Windows API. Eligible access/sharing/locking errors during pointer replacement receive a bounded two-second retry. The existing pointer is never pre-deleted.
+
+When Windows reports an abandoned mutex owner, the next owner checks any existing pointer and its complete referenced generation before proceeding. Inconsistent state is refused; absence of a pointer is permitted for an interrupted first publication. Mutex handles and ownership are released through normal exception handling.
+
+Coordination applies to cooperating publishers using the same normalized path, user, and session. Different aliases, sessions/users, and external programs are outside that guarantee. `LATEST` is the last completed pointer promotion, not a guarantee of ordering by generation creation time. Scheduling and in-progress OS calls can extend observed wall time beyond a wait/retry deadline.
+
+See [DURABILITY_CONTRACT.md](DURABILITY_CONTRACT.md) for the exact state transitions and Windows qualifications.
+
+## Verification and recovery
+
+Runtime verification checks database integrity and the journal's sequence, hash links, event hashes, head, and event count. Replayed values must agree with the current record values. The consistency check also applies before checkpoint publication and during snapshot inspection/recovery.
+
+A representation is eligible for recovery only when its file size/hash match the manifest, it parses, and its journal and replayed values verify. Automatic recovery requires at least two eligible representations with the same logical digest, and that digest must match the published manifest. There is no intrinsic SQLite/JSONL/XML preference.
+
+A recovery procedure should:
+
+1. Preserve the damaged workspace before attempting changes.
+2. Inspect a published generation with `verify-snapshot`.
+3. Confirm the eligible quorum and manifest agreement.
+4. Recover into a separate absent or empty target.
+5. Verify the recovered workspace and compare required application invariants before adopting it.
+
+If agreement cannot be established, recovery refuses. It does not choose the newest file or a preferred format. See [RECOVERY_PLAYBOOK.md](RECOVERY_PLAYBOOK.md).
+
+### Failure behavior
+
+| Situation | Behavior |
 | --- | --- |
-| `STATE.md` | Current objective and last verified checkpoint |
-| `TODO.md` | Pending work and commitments |
-| `LOG.md` | Human-readable operational chronology |
-| `ERROR_LOG.md` | Errors, consequences, and unresolved failures |
-| `DECISIONS.md` | Decisions, rationale, alternatives, and supersession |
-| `WORKSPACE.json` | Workspace-control identity and declared boundaries |
+| Invalid canonical value | Reject the mutation; retain committed state |
+| Journal append fails during mutation | Roll back the record change and event transaction |
+| Values disagree with journal replay | Fail verification/checkpoint eligibility |
+| Checkpoint fails before publication | Attempt cleanup of its owned staging material |
+| Generation publishes but pointer promotion fails | Retain the complete generation for inspection; do not pre-delete the existing pointer |
+| Mutex acquisition times out | Raise an explicit error and clean the publisher's owned temporary pointer through ordinary exception handling |
+| Abandoned owner leaves inconsistent pointer/generation state | Refuse promotion after inspection |
+| One representation is damaged | Recover from the other two if they remain eligible and agree with the manifest |
+| Quorum or manifest agreement is absent | Refuse automatic recovery |
+| Process is forcibly terminated | Reopen and verify committed state; inspect interrupted artifacts separately |
 
-They are starting points, not an automatically maintained ledger service. An application decides whether a control file is descriptive, authoritative, or a rendered view of stored records. If its contents matter operationally, record their content hash or normalized representation and define how disagreement is resolved. No filesystem watcher or bidirectional Markdown synchronization is included.
+Ordinary exception cleanup and forced termination are different cases: a killed process cannot execute cleanup. Preserve unexpected remnants for inspection and do not delete another publisher's files merely because they look temporary.
 
-## How the state is protected
+Hashes and agreement establish the stated consistency checks, not authorship or truth of record contents. Windows directory-handle synchronization is not implemented. The tests do not establish physical power-loss durability, storage-device failure tolerance, or independent backup recovery.
 
-**Transactional runtime.** SQLite uses WAL and `synchronous=FULL`. A record mutation and its corresponding journal event commit in the same transaction. The journal links each event to the previous event's hash.
+## Validation record
 
-**Replay consistency.** Verification checks the chain and replays its events. Declared record values must agree with that replay. The same consistency check applies to checkpoint eligibility, snapshot inspection, and recovery.
-
-**Three representations.** A checkpoint writes SQLite, JSONL, and typed XML, then a manifest with file hashes and a shared logical digest. A staging directory is never a published snapshot. Recovery requires two valid agreeing representations and agreement with the manifest; no format gets automatic precedence. All three copies share the workspace's storage location, so they are not independent off-device backups.
-
-**Canonical data.** DWSK-CJ-1 accepts null, Booleans, strings, arrays, string-keyed objects, and signed 64-bit integers. Text is NFC-normalized; Booleans and integers retain distinct canonical representations. Floats are rejected. Keep original document bytes outside normalization and retain their locations and hashes when byte identity matters.
-
-Canonicalization also rejects out-of-range integers, nonstring object keys, and object keys that collide after NFC normalization. Binary objects and Python-specific containers need an application-defined representation. If a metric is nonintegral, an application can store a decimal string and declare how that string is interpreted:
-
-```json
-{
-  "observed_count": 12,
-  "review_complete": false,
-  "confidence_decimal": "0.875",
-  "source_refs": ["sources/document-001"]
-}
-```
-
-The decimal string is an application convention; DWSK does not assign it numeric semantics.
-
-**Windows publication.** Generation construction stays parallel. Pointer promotion is protected by a named mutex for the current user, Windows session, and normalized workspace path. Acquisition waits up to five seconds; eligible pointer-replacement failures receive a bounded two-second retry. When Windows reports an abandoned owner, DWSK inspects an existing pointer and its complete generation before proceeding. Inconsistent state is refused. The prior pointer is never pre-deleted.
-
-`LATEST` identifies the last completed pointer promotion. Applications decide freshness, acceptance, and semantic authority. Different path aliases, sessions/users, external programs, and higher-level conflicting decisions are outside the mutex's coordination guarantee.
-
-## Recover deliberately
-
-Preserve the damaged workspace first. Inspect a published generation with `dwsk verify-snapshot`, review its quorum and manifest fields, and recover into a separate new or empty target. A successful inspection command alone is not acceptance of an invalid snapshot. If no eligible quorum exists, recovery refuses rather than choosing a preferred format.
-
-A checkpoint failure can leave a complete unreferenced generation after publication but before pointer promotion. Keep it for inspection. Read the [durability contract](DURABILITY_CONTRACT.md) and [recovery playbook](RECOVERY_PLAYBOOK.md) before operational use.
-
-Windows directory-handle synchronization is not implemented. The evidence covers ordinary execution, injected faults, concurrency, and controlled process interruption; physical power loss, hardware/storage loss, and independent backup recovery are outside the demonstrated guarantees.
-
-## Failure behavior worth designing around
-
-| Situation | Expected behavior or response |
-| --- | --- |
-| A value falls outside DWSK-CJ-1 | Reject the mutation; retain the previously committed state |
-| Journal append fails during mutation | Roll back the transaction, including its record change |
-| Current values disagree with journal replay | Verification/checkpoint eligibility fails; investigate the discrepancy |
-| Checkpoint fails before generation publication | Ordinary exception handling attempts owned-staging cleanup; inspect remnants if cleanup fails |
-| Generation is published but pointer promotion fails | Keep the complete generation for inspection; do not pre-delete the existing pointer |
-| Mutex acquisition times out | Raise an explicit error and clean the publisher's owned temporary pointer |
-| Windows reports an abandoned mutex owner | Inspect any existing pointer and complete referenced generation before proceeding; refuse inconsistency |
-| One snapshot representation is damaged | Recovery may proceed from the other two if they verify and match the manifest |
-| No eligible agreement or manifest match exists | Refuse automatic recovery for operator review |
-| A process is forcibly terminated | Reopen and verify committed state; inspect retained staging or other interrupted artifacts separately |
-
-Ordinary exception cleanup and forced process termination are different cases. A killed process cannot run its cleanup code. Another publisher must not delete files merely because their names look temporary; ownership and published-generation boundaries matter.
-
-A chain of hashes and agreement between formats establish specific consistency checks. They are not an external signature, an authorship certificate, or independent evidence that application records are true. Trust in the source and custody of records remains an integration concern.
-
-## What has been validated
-
-Source validation and installed-wheel validation are separate records:
+Source validation and installed-wheel validation are recorded separately:
 
 | Scope | Recorded result |
 | --- | --- |
 | Source hardening / deterministic fuzzy / torture | 32 / 1,000 / 8 passed |
 | Source native checkpoint trials | 20 passed, covering 240 calls |
 | Installed unit / self-validation | 17 / 7 passed in each mode |
-| Installed retry / native mutex checks | 8 / 12 passed in each mode |
+| Installed retry / native mutex tests | 8 / 12 passed in each mode |
 | Installed CLI checks | 15 passed in each mode |
 | Installed single-format recovery variants | 3 passed in each mode |
 | Installed four-process checkpoint calls | 12 passed in each mode |
 
-Both normal and optimized Python were exercised. Installed tests ran outside the source tree, with installed imports verified. Native mutex tests covered exclusion, timeout, actual owner termination, abandoned-state inspection/refusal, and handle cleanup. The broader source matrix was distributed across modes; it was not run twice in full.
+Normal and optimized Python were exercised. Installed checks ran outside the source tree with installed imports verified. Native mutex tests covered exclusion, timeout, real owner termination, abandoned-state inspection/refusal, and handle cleanup. The broader source matrix was distributed across modes rather than run twice in full.
 
-These are bounded Windows/Python 3.14 results, not exhaustive coverage or acceptance on every declared interpreter/OS. The underlying Windows cause remains unresolved. Earlier failed campaigns were retained in private evidence. See the [source-validation basis](VALIDATION_REPORT.md) and [installed build report](BUILD_REPORT.md).
+These are bounded Windows/Python 3.14 results. They do not establish exhaustive coverage or runtime acceptance on every declared interpreter/OS. Earlier failed campaigns remain retained in the private evidence; the underlying Windows cause remains unresolved.
 
-## Project map and contribution entry points
+Read the [source-validation basis](VALIDATION_REPORT.md) and [installed build report](BUILD_REPORT.md). The build report describes its stated build date. [Artifact identities](docs/build/ARTIFACTS.json) and [distribution checksums](docs/build/SHA256SUMS) refer to the original binaries held outside this repository. [SOURCE_SHA256SUMS](SOURCE_SHA256SUMS) covers this source export, including the current README.
 
-| Location | Purpose |
+## Project files
+
+| Location | Contents |
 | --- | --- |
-| [src/durable_workspace/](src/durable_workspace/) | Runtime store, canonical profile, formats, recovery, publication guard, and CLI |
-| [tests/](tests/) and [validate.py](validate.py) | Included unit checks and self-validation program |
-| [examples/](examples/) | Small API example |
+| [src/durable_workspace/](src/durable_workspace/) | Workspace implementation, canonical profile, formats, and CLI |
+| [tests/](tests/) | Included unit and readiness checks |
+| [validate.py](validate.py) | Included self-validation program |
+| [examples/](examples/) | Small Python API example |
 | [schemas/](schemas/) | Snapshot manifest schema |
-| [templates/workspace-control/](templates/workspace-control/) | Human-readable STATE, TODO, LOG, ERROR_LOG, and DECISIONS starting points |
-| [DEVELOPMENT_GUIDANCE.md](DEVELOPMENT_GUIDANCE.md) | Per-project integration and source-preservation guidance |
-| [docs/build/ARTIFACTS.json](docs/build/ARTIFACTS.json) | Identity and hashes of the rebuilt distributions, held outside this repository |
-| [SOURCE_SHA256SUMS](SOURCE_SHA256SUMS) | Integrity inventory for this repository export |
+| [templates/workspace-control/](templates/workspace-control/) | Starting files for STATE, TODO, LOG, ERROR_LOG, DECISIONS, and workspace metadata |
+| [MODULE_BOUNDARY.md](MODULE_BOUNDARY.md) | Persistence boundary |
+| [DEVELOPMENT_GUIDANCE.md](DEVELOPMENT_GUIDANCE.md) | Integration and source-preservation guidance |
+| [CHANGELOG.md](CHANGELOG.md) | Version history |
 
-Begin a change by reading the contract and module boundary. Use disposable fixtures, specify expected rejection behavior, and check state preservation as well as return values. Included tests can be run from this project directory with the environment's Python:
+The control-file templates are static files included with the source. The Python package does not update them automatically.
+
+## Working on the kit
+
+Read the contract before changing transaction, journal, publication, or recovery behavior. Use disposable fixtures and specify the expected rejection type/cause. Check full state preservation where promised; a return code or unchanged record count alone is insufficient.
+
+From the project directory, after source installation:
 
 ```powershell
 .\.venv\Scripts\python.exe -m unittest discover -s tests -p "test_*.py" -v
 .\.venv\Scripts\python.exe validate.py
 ```
 
-Agent adapters, conversation capture, ledger schemas, retrieval policy, and semantic reconciliation are useful integration directions. Define their authority and source boundaries explicitly; storing a record does not establish its approval or meaning.
+Keep databases, snapshots, raw logs, and temporary environments outside the source export. Record source-validation results separately from installed-package checks and preserve failures when reviewing a later successful run.
 
-## Integration questions to settle first
-
-Before wiring this into a conversational agent, decide:
-
-- **Capture:** which authorized source supplies messages, documents, tool results, and execution evidence?
-- **Record identity:** how are records named, linked to original bytes, and distinguished from duplicates or later revisions?
-- **Authority:** who can approve actions, and which component enforces that approval?
-- **Continuation:** which records enter the next session, and how does the application avoid presenting a tentative note as established fact?
-- **Concurrency:** which writer owns project-level decisions, and how are semantic conflicts detected and resolved?
-- **Retention and access:** which records may be stored, retrieved, exported, or shared, and where is access control enforced?
-- **Recovery:** who chooses an eligible generation and validates higher-level invariants before adopting recovered state?
-
-DWSK 0.1.1 supplies a bounded persistence component for these designs. Automatic capture, agent configuration, search/retrieval policy, access-control services, and application-specific ledgers need their own integration work and evidence. They should not be inferred from a successful checkpoint.
-
-Licensing and attribution follow the parent OpenSurface [license](../../LICENSE), [license continuation](../../LICENSING.md), and [authorship record](../../AUTHORS.md). Preserve applicable notices when redistributing source.
+Licensing and attribution follow OpenSurface's [license](../../LICENSE), [license continuation](../../LICENSING.md), and [authorship record](../../AUTHORS.md). Preserve applicable notices when redistributing source.
