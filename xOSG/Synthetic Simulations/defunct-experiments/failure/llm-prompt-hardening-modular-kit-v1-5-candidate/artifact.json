@@ -32,9 +32,10 @@
     "observed_mode": "0666"
   },
   "publication": {
+    "intent": "publish-cleaned-defunct-experiment",
     "source_included": false,
     "raw_archive_included": false,
     "package_license_grant_found": false,
-    "state": "summary-only"
+    "state": "summary-only-pending-license-and-sanitation"
   }
 }

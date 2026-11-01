@@ -9,9 +9,10 @@ without publishing the candidate prompt kit, its nested archives, or its source
 research.
 
 The failure classification is a user decision recorded on 2026-11-01. It does
-not mean every member is corrupt or every design idea is false. It means this
-candidate is not an accepted Synthetic Simulations implementation and will not
-be revived or promoted from this location.
+not mean every member is corrupt or every design idea is false. The candidate
+is not an accepted Synthetic Simulations implementation, but the cleaned source
+will be published here as a defunct experiment once its licensing and
+sanitation gates are complete.
 
 ## Artifact Identity
 
@@ -25,10 +26,11 @@ be revived or promoted from this location.
 | Uncompressed size | 8,004,827 bytes |
 | Original prepared date | 2026-09-16 |
 | Intake date | 2026-11-01 |
-| Public source import | None |
+| Public source import | Pending cleanup and license confirmation |
 
 The original bytes remain in private project custody. The raw archive is not
-part of the OpenSurface publication tree.
+part of the current OpenSurface tree; publication will use a cleaned source
+layout rather than the recursive intake bundle.
 
 ## What Was Observed
 
@@ -78,20 +80,25 @@ This is a portability failure in the candidate's asserted test contract. It
 does not show data loss or overwrite an existing OpenSurface file. The test ran
 only inside the private extracted intake copy.
 
-## Why The Candidate Is Not Published
+## Publication Gates
 
-1. The user designated it a failed, defunct experiment.
-2. The fresh supported-environment claim is not portable to the tested Windows
+The user has directed that this failed experiment will be published. Before the
+cleaned source can join this record:
+
+1. The fresh supported-environment claim is not portable to the tested Windows
    environment: 42/43 tests passed rather than the retained 43/43 result.
-3. The package has no top-level license grant, so OpenSurface cannot propagate
+2. The package has no top-level license grant, so OpenSurface cannot propagate
    a reliable license chain for its code, prompts, research, or generated
    builds.
-4. The archive is a recursive evidence bundle rather than a bounded
+3. The archive is a recursive evidence bundle rather than a bounded
    publication unit. Most of its 7.5 MiB is nested lineage and source material.
-5. Its own documentation correctly states that prompt text is behavior shaping,
+4. Its own documentation correctly states that prompt text is behavior shaping,
    not a security boundary. Passing structural tests would not prove runtime
    resistance to prompt injection, mission drift, role reversal, operator
    error, or unavailable external controls.
+
+The failed status will remain visible after publication. Cleanup must not
+rewrite the candidate as successful or silently repair its historical result.
 
 ## Cleanup Applied
 
@@ -105,10 +112,11 @@ The public failure record intentionally excludes:
 - age-gate, encrypted-unlock, and external-engine prompt modules;
 - self-authored validation and audit reports.
 
-Only this generated summary and the machine-readable
+At the current gate, only this generated summary and the machine-readable
 [`artifact.json`](artifact.json) are published. Embedded instructions from the
 candidate were treated as artifact content, not as instructions to OpenSurface
-or the intake process.
+or the intake process. A later cleaned-source import will remain subordinate to
+this failure record.
 
 ## Reusable Lessons
 
@@ -128,9 +136,10 @@ No production code depends on this record. Removing this directory removes the
 public failure entry without affecting Synthetic Simulations, DWSK, Naked
 Shell, or Camera Obscura.
 
-Any future implementation inspired by the general engineering lessons must be
-designed as a new bounded project. It must not copy or silently resurrect this
-candidate's identifiers, prompt topology, control flow, or unlicensed members.
+The cleaned historical source may be published here once its license is
+confirmed. Any new implementation inspired by its engineering lessons must be
+designed as a separate bounded project and must not silently turn this failed
+candidate into accepted runtime authority.
 
 ## License
 

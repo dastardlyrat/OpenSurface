@@ -138,6 +138,8 @@ repository, commit, and original authorship remain recorded above.
   entries matched; a fresh Windows/Python 3.14.4 run passed 42 of 43 tests
 - Reproduced failure: atomic replacement mode test required POSIX `0644` and
   observed `0666` on Windows
-- Publication state: generated summary and machine-readable receipt only; raw
-  archive and all candidate members remain excluded because the candidate has
-  no package-level license grant
+- Publication intent: user directed publication as a failed, defunct
+  experiment on 2026-11-01
+- Current publication state: generated summary and machine-readable receipt
+  only; cleaned source import remains pending package-level license confirmation
+  and sanitation of the recursive evidence bundle

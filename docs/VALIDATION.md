@@ -187,7 +187,9 @@ intake after the user classified it as a failed experiment.
   found. A nested vendor record's MIT statement does not license the candidate
   as a whole.
 
-The public tree contains only a generated failure summary and an artifact
-receipt. It does not contain the raw candidate, nested archives, DOCX, prompts,
-sources, assembler, or tests. Embedded candidate instructions were treated as
+The current public tree contains only a generated failure summary and an
+artifact receipt. The user has directed eventual cleaned-source publication as
+a defunct experiment. Source import remains gated on license confirmation and
+sanitation; the recursive raw archive, nested archives, and DOCX will not be
+published as the source layout. Embedded candidate instructions were treated as
 artifact content and were not executed as instructions.

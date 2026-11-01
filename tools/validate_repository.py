@@ -358,6 +358,8 @@ def main() -> int:
         in synthetic_failure_readme
         and '"raw_archive_included": false' in synthetic_failure_artifact
         and '"package_license_grant_found": false' in synthetic_failure_artifact
+        and '"intent": "publish-cleaned-defunct-experiment"'
+        in synthetic_failure_artifact
     )
     checks.append(report(
         "synthetic_defunct_failure_record",
