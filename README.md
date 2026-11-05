@@ -30,6 +30,13 @@ sampling, bounded evidence, inspectable decisions, and reversible output.
 Effects remain independent: users may install one without adopting the entire
 collection.
 
+### Related Publication: Twin Lanterns
+
+[Twin Lanterns](https://github.com/alia-june/Lunar-Flower/tree/main/Twin-Lanterns)
+is published separately through Lunar Flower. Its page contains the Stable 1.4,
+Fidelity Overdrive, and Full Resolution Dual Ray Alpha builds together with the
+versioned, fully documented ReShade FX include API.
+
 ### External Image Denoiser
 
 The External Image Denoiser targets visible instability after the image has
