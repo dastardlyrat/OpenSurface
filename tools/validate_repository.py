@@ -307,6 +307,7 @@ def main() -> int:
     ))
 
     root_readme = (ROOT / "README.md").read_text(encoding="utf-8")
+    normalized_root_readme = " ".join(root_readme.split())
     surface_match = re.search(
         r"Current shader surface: \*\*(\d+) project units · (\d+) `\.fx` effect files · "
         r"(\d+) `\.fxh`\s+API/header files · (\d+) ReShade techniques\*\*",
@@ -338,6 +339,27 @@ def main() -> int:
         f"documented={documented_surface}; actual={current_surface}; unit links=4/4"
         if surface_current
         else f"documented={documented_surface}; actual={current_surface}",
+    ))
+
+    revival_root = "https://github.com/dastardlyrat/Lazara-Reshade-Revival-Package"
+    revival_cache_symbols = (
+        "CAMERA_OBSCURA_StabilizedColorCaptureV1",
+        "CAMERA_OBSCURA_StabilizedColorReapplyV1",
+        "CAMERA_OBSCURA_StabilizedLumaCaptureV1",
+        "CAMERA_OBSCURA_StabilizedLumaReapplyV1",
+    )
+    revival_boundary = (
+        revival_root in root_readme
+        and "364ef53991081cec444e2dc0d6aa595fa5d733a0" in root_readme
+        and all(symbol in root_readme for symbol in revival_cache_symbols)
+        and "not part of the current OpenSurface tree" in normalized_root_readme
+        and not (camera_root / "Stabilized Color Cache").exists()
+        and not (camera_root / "Stabilized Luma Cache").exists()
+    )
+    checks.append(report(
+        "revival_package_cache_boundary",
+        revival_boundary,
+        "four package-only cache techniques documented without local promotion",
     ))
 
     relocated = "https://github.com/alia-june/xOSG-prototype/tree/main/docs/xosg"

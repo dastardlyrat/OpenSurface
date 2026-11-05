@@ -69,6 +69,28 @@ License continuation: the previously unlicensed project-owned Lazara source is
 expressly published under MIT on 2026-10-31 by owner direction. The source
 repository, commit, and original authorship remain recorded above.
 
+## Package-only Stabilized Color And Luma Caches
+
+- Distribution source:
+  `https://github.com/dastardlyrat/Lazara-Reshade-Revival-Package`
+- Introduction revision:
+  `364ef53991081cec444e2dc0d6aa595fa5d733a0`
+- Stabilized Color Cache SHA-256:
+  `DCF7389E3BA83E8F73EB9880433F14ABF800CBB2FA9F0D7705779AE5CD655D56`
+- Stabilized Luma Cache SHA-256:
+  `29FBCDE85ECFADA365A8F7BF484FA99CCE5CC5E955D0DAB95C5648169EB3F952`
+- Source state: project-owned direct sources in the Revival package; each
+  effect contains a Capture and Reapply technique and depends only on the
+  installation-provided `ReShade.fxh`
+- License: inline MIT SPDX metadata
+- Package evidence: the Revival package validator passes 5/5 for 18 techniques,
+  15 effect files, its 110-file shader closure, vendored manifest, and no
+  submodules
+- OpenSurface state: recorded external package surface; neither effect is
+  present in this repository's current tree or source manifest
+- Unresolved evidence: no standalone README, focused validator, or recorded
+  live compile and visual-acceptance result for either cache pair
+
 ## xOSG | expert Overlay System Gestalt
 
 - Source: none

@@ -27,6 +27,36 @@ contain a preset, ReShade itself, or the installation-provided `ReShade.fxh`.
 The root [source manifest](SOURCE_MANIFEST.sha256) records the exact bytes of all
 five effects and six support files.
 
+## Additional Camera Obscura Effects In Lazara Revival
+
+The public
+[Lazara ReShade Revival package](https://github.com/dastardlyrat/Lazara-Reshade-Revival-Package)
+contains two additional project-owned Camera Obscura effect files. They are
+part of that package's install-ready 18-technique preset closure, but are **not
+part of the current OpenSurface tree or `SOURCE_MANIFEST.sha256`**.
+
+| Package-only effect | Techniques | Purpose |
+|---|---|---|
+| [Stabilized Color Cache](https://github.com/dastardlyrat/Lazara-Reshade-Revival-Package/blob/main/reshade-shaders/Shaders/camera_obscura_reapply/effects/CAMERA_OBSCURA_StabilizedColorCacheV1.fx) | `CAMERA_OBSCURA_StabilizedColorCaptureV1`, `CAMERA_OBSCURA_StabilizedColorReapplyV1` | Captures same-frame chroma relative to source luma, then reapplies bounded chroma while preserving current luma |
+| [Stabilized Luma Cache](https://github.com/dastardlyrat/Lazara-Reshade-Revival-Package/blob/main/reshade-shaders/Shaders/camera_obscura_reapply/effects/CAMERA_OBSCURA_StabilizedLumaCacheV1.fx) | `CAMERA_OBSCURA_StabilizedLumaCaptureV1`, `CAMERA_OBSCURA_StabilizedLumaReapplyV1` | Captures same-frame Rec. 709 luma, then reapplies a bounded scalar luma correction while retaining channel separation |
+
+Both files are MIT-identified, depend only on the installation's
+`ReShade.fxh`, and were introduced by
+[`364ef539`](https://github.com/dastardlyrat/Lazara-Reshade-Revival-Package/commit/364ef53991081cec444e2dc0d6aa595fa5d733a0).
+The Revival package currently passes its 5/5 structural package validator for
+18 techniques, 15 effect files, and a closed 110-file shader surface. That does
+not establish standalone live compile or visual acceptance for these two cache
+pairs, so this README records them without silently promoting them into the
+OpenSurface manifest.
+
+The rest of the Revival package reconciles as follows: its External Image
+Denoiser and Stabilized Detail Cache effects are byte-identical to OpenSurface;
+its Guided Detail effects differ only by OpenSurface's added SPDX copyright
+line; its Lazara effect is the earlier `OCCULT_lazara` implementation rather
+than the active OpenSurface refactor; and Black Wand, Golden Weave, and
+FoolsGold remain pinned Occult Box package material rather than OpenSurface
+units.
+
 ## What The Units Do
 
 ### External Image Denoiser
@@ -115,7 +145,7 @@ Run the current-tree validator from the repository root:
 python -B tools/validate_repository.py
 ```
 
-Current result: **18/18 passed**.
+Current result: **19/19 passed**.
 
 The validator checks the exact effect and technique sets, documented public
 surface, local include closure, external `ReShade.fxh` boundary, source hashes,
