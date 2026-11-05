@@ -1,7 +1,7 @@
 # OpenSurface
 
 OpenSurface hosts the Camera Obscura publication tree. The xOSG AI instrumentation
-family has moved to [alia-june/xOSG-prototype](https://github.com/alia-june/xOSG-prototype/tree/main/xOSG).
+family has moved to [alia-june/xOSG-prototype](https://github.com/alia-june/xOSG-prototype/tree/main/docs/xosg).
 
 This repository is a storefront, not a development dump. Each published unit
 must be independently understandable, installable, removable, licensed, and
@@ -21,7 +21,7 @@ continue forward; publication never silently replaces them.
 | [Guided Detail](Camera%20Obscura/Guided%20Detail/) | Same-surface detail reclamation and guided line emphasis | Published source with diagnostic workflow |
 | [Stabilized Detail Cache](Camera%20Obscura/Stabilized%20Detail%20Cache/) | Captures bounded signed detail and restores it later in the chain | Live compile and visual pass recorded |
 | [Lazara Color Revival](Camera%20Obscura/Lazara%20Color%20Revival/) | Recovers muted source color or deliberately removes it | Refactored candidate; live regression still required |
-| [xOSG — relocated](https://github.com/alia-june/xOSG-prototype/tree/main/xOSG) | AI instrumentation: Naked Shell, Amorphous Durable AI Workspace / DWSK, and Synthetic Simulations | Maintained in alia-june/xOSG-prototype; no current xOSG working tree here |
+| [xOSG — relocated](https://github.com/alia-june/xOSG-prototype/tree/main/docs/xosg) | AI instrumentation: Naked Shell, Amorphous Durable AI Workspace / DWSK, and Synthetic Simulations | Maintained in alia-june/xOSG-prototype; no current xOSG working tree here |
 
 ## Camera Obscura
 
@@ -69,7 +69,7 @@ admitted chroma while preserving source luma.
 
 ## xOSG — relocated
 
-The reviewed current xOSG family moved to [alia-june/xOSG-prototype](https://github.com/alia-june/xOSG-prototype/tree/main/xOSG) on 2026-11-05, including the merged DWSK R4 source, Naked Shell identity, and Synthetic Simulations documentation and sanitized failed experiment.
+The reviewed current xOSG family moved to [alia-june/xOSG-prototype](https://github.com/alia-june/xOSG-prototype/tree/main/docs/xosg) on 2026-11-05, including the merged DWSK R4 source, Naked Shell identity, and Synthetic Simulations documentation and sanitized failed experiment.
 
 The public destination records source lineage, license continuation, imported-file identities, privacy-review limits, and fresh fixed DWSK source checks. This repository's earlier commits remain historical evidence. Camera Obscura source and its validation requirements are unchanged.
 
