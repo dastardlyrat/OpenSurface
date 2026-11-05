@@ -14,7 +14,7 @@ the authorship, source revision, and notices carried by each admitted project.
   published under MIT by owner direction. The renamed refactor preserves the
   source repository and revision in the provenance ledger.
 - **xOSG — relocated:** the existing MIT grant and attribution continue in the
-  [migrated family](https://github.com/alia-june/xOSG-prototype/tree/main/xOSG). Its license and original
+  [migrated family](https://github.com/alia-june/xOSG-prototype/tree/main/docs/xosg). Its license and original
   notices were carried forward; the current xOSG working tree is no longer here.
 - **ReShade:** external dependency, not bundled. Its own licenses continue to
   govern it.

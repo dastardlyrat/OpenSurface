@@ -307,7 +307,7 @@ def main() -> int:
     ))
 
     root_readme = (ROOT / "README.md").read_text(encoding="utf-8")
-    relocated = "https://github.com/alia-june/xOSG-prototype/tree/main/xOSG"
+    relocated = "https://github.com/alia-june/xOSG-prototype/tree/main/docs/xosg"
     publication_identity = (
         "storefront, not a development dump" in root_readme
         and "OpenSurface Publishing Boundary" in (ROOT / "PUBLISHING.md").read_text(encoding="utf-8")
