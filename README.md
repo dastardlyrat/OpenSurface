@@ -1,142 +1,147 @@
 # OpenSurface
 
-OpenSurface hosts the Camera Obscura publication tree. The xOSG AI instrumentation
-family has moved to [alia-june/xOSG-prototype](https://github.com/alia-june/xOSG-prototype/tree/main/docs/xosg).
+**Public Camera Obscura image tools for ReShade**
 
-This repository is a storefront, not a development dump. Each published unit
-must be independently understandable, installable, removable, licensed, and
-traceable to its source. Experimental branches, machine logs, raw validation
-forms, private workspace paths, and unaccepted artifacts stay in the private
-workshop.
+OpenSurface is the current public distribution tree for Camera Obscura. It is a
+storefront, not a development dump: the repository carries reviewed source,
+installation guidance, licensing, provenance, integrity records, and bounded
+validation results rather than the private workshop.
 
-Original OpenSurface software is released under the MIT License unless an
-individual file states otherwise. Existing license and authorship obligations
-continue forward; publication never silently replaces them.
+Current shader surface: **4 project units · 5 `.fx` effect files · 6 `.fxh`
+API/header files · 6 ReShade techniques**.
 
-## Projects
+Start with the [Camera Obscura guide](Camera%20Obscura/README.md) for the shared
+method, practical pipeline, diagnostic conventions, and test discipline.
 
-| Project | What it does | Publication state |
-|---|---|---|
-| [External Image Denoiser](Camera%20Obscura/External%20Image%20Denoiser/) | Multiscale spatial and temporal denoising for the completed image | Install-ready V2.1; live application confirmed |
-| [Guided Detail](Camera%20Obscura/Guided%20Detail/) | Same-surface detail reclamation and guided line emphasis | Published source with diagnostic workflow |
-| [Stabilized Detail Cache](Camera%20Obscura/Stabilized%20Detail%20Cache/) | Captures bounded signed detail and restores it later in the chain | Live compile and visual pass recorded |
-| [Lazara Color Revival](Camera%20Obscura/Lazara%20Color%20Revival/) | Recovers muted source color or deliberately removes it | Refactored candidate; live regression still required |
-| [xOSG — relocated](https://github.com/alia-june/xOSG-prototype/tree/main/docs/xosg) | AI instrumentation: Naked Shell, Amorphous Durable AI Workspace / DWSK, and Synthetic Simulations | Maintained in alia-june/xOSG-prototype; no current xOSG working tree here |
+## What Is Actually Provided
 
-## Camera Obscura
+| Unit | Shipped source | ReShade techniques | Distribution state | Current evidence boundary |
+|---|---|---|---|---|
+| [External Image Denoiser](Camera%20Obscura/External%20Image%20Denoiser/) | 1 effect + 1 API include | `CAMERA_OBSCURA_ExternalImageDenoiseV1` | Install-ready `reshade-shaders` tree | Accepted V2.1 package recorded 30/30 focused checks; live application and order were confirmed; universal motion, quality, and performance remain open |
+| [Guided Detail](Camera%20Obscura/Guided%20Detail/) | 2 effects + 2 headers | `OSCO_GuidedDetailReclamation`, `OSCO_GuidedInkLines` | Source unit; preserve sibling `effects` and `header` folders | Accepted public staging source with a documented compile and visual-test procedure; no universal runtime claim |
+| [Stabilized Detail Cache](Camera%20Obscura/Stabilized%20Detail%20Cache/) | 1 effect + 1 API include | `CAMERA_OBSCURA_StabilizedDetailCaptureV1`, `CAMERA_OBSCURA_StabilizedDetailReapplyV1` | Source unit; preserve sibling `effects` and `api` folders | 19/19 source-package checks and a user-reported clean compile and visual pass; loading, long-motion, and high-memory gates remain open |
+| [Lazara Color Revival](Camera%20Obscura/Lazara%20Color%20Revival/) | 1 effect + 2 headers | `OSCO_LazaraColorRevival` | Source unit; preserve sibling `effects` and `header` folders | Local helper/compiler harnesses pass; full ReShade compile and side-by-side visual regression remain open after the namespace/include refactor |
 
-Camera Obscura is a collection of ReShade effects built around explicit
-sampling, bounded evidence, inspectable decisions, and reversible output.
-Effects remain independent: users may install one without adopting the entire
-collection.
+The current tree contains exactly eleven tracked shader sources. It does not
+contain a preset, ReShade itself, or the installation-provided `ReShade.fxh`.
+The root [source manifest](SOURCE_MANIFEST.sha256) records the exact bytes of all
+five effects and six support files.
 
-### Related Publication: Twin Lanterns
-
-[Twin Lanterns](https://github.com/alia-june/Lunar-Flower/tree/main/Twin-Lanterns)
-is published separately through Lunar Flower. Its page contains the Stable 1.4,
-Fidelity Overdrive, and Full Resolution Dual Ray Alpha builds together with the
-versioned, fully documented ReShade FX include API.
+## What The Units Do
 
 ### External Image Denoiser
 
-The External Image Denoiser targets visible instability after the image has
-already been formed. Five independently controlled size bands cover tiny
-through extra-large noise. Spatial evidence and temporal history may operate
-together, by agreement, or in isolation.
-
-It is deliberately not a lighting system. It does not trace rays, transport
-donor light, reconstruct GI, or add illumination. Its diagnostic views expose
-what it detected, trusted, admitted, and changed.
-
-[Read the denoiser guide](Camera%20Obscura/External%20Image%20Denoiser/README.md)
+A completed-image denoiser with five independently controlled spatial size
+bands, temporal history, depth-aware rejection, combination modes, exact bypass
+paths, and diagnostics that separate detection, authority, candidate change,
+and applied change. It filters existing image instability; it does not generate
+lighting, trace rays, or reconstruct GI.
 
 ### Guided Detail
 
-Guided Detail Reclamation restores bounded signed tonal structure. Guided Ink
-Lines adds optional line and contour emphasis from admitted same-surface
-evidence. The pair is useful before the denoiser when fine structure should be
-chosen deliberately rather than recovered from an already softened image.
-
-![Guided Detail diagnostic](Camera%20Obscura/Guided%20Detail/docs/images/guided-detail-diagnostic.png)
+Two RGB-neutral tonal tools. Guided Detail Reclamation restores bounded signed
+structure where depth confidence and same-surface support permit it. Guided Ink
+Lines adds optional coherent contour emphasis from the same evidence model.
+Neither should be treated as a blind universal sharpener.
 
 ### Stabilized Detail Cache
 
-The cache separates detail selection from final application. Capture stores a
-bounded signed-detail field after reclamation and denoising; Reapply can restore
-that field after intervening color or image effects. The full-resolution
-`RGBA16F` store uses 64 bits per pixel, approximately 63.3 MiB at 3840x2160.
+A same-frame Capture/Reapply pair. Capture stores a bounded signed `RGBA16F`
+detail residual after selection and denoising; Reapply can restore that residual
+after later color or image effects. It is not temporal accumulation or storage
+across frames, loading screens, or sessions.
 
 ### Lazara Color Revival
 
-Lazara Color Revival strengthens observed source and local color relationships
-without assigning a fixed hue family. Its inverted mode intentionally removes
-admitted chroma while preserving source luma.
+A source-derived color effect that strengthens color already supported by the
+current pixel and a small local palette. Its deliberate degradation mode removes
+admitted chroma while preserving source luma. It is not a LUT, fixed palette,
+white-balance solver, or license to invent absent color.
 
-![Lazara Color Revival comparison](Camera%20Obscura/Lazara%20Color%20Revival/docs/images/lazara-color-revival-comparison.png)
+## Installation Models
 
-## xOSG — relocated
+The repository currently uses two installation models:
 
-The reviewed current xOSG family moved to [alia-june/xOSG-prototype](https://github.com/alia-june/xOSG-prototype/tree/main/docs/xosg) on 2026-11-05, including the merged DWSK R4 source, Naked Shell identity, and Synthetic Simulations documentation and sanitized failed experiment.
+1. **Install-ready tree — External Image Denoiser.** Merge its
+   `reshade-shaders` directory into the game's existing `reshade-shaders`
+   directory, reload ReShade, and enable the documented technique.
+2. **Source units — Guided Detail, Stabilized Detail Cache, and Lazara Color
+   Revival.** Copy the selected unit without flattening its sibling folders,
+   then add its `effects` directory to ReShade's effect search paths and its
+   `header` or `api` directory to the shader search paths as described in the
+   unit README.
 
-The public destination records source lineage, license continuation, imported-file identities, privacy-review limits, and fresh fixed DWSK source checks. This repository's earlier commits remain historical evidence. Camera Obscura source and its validation requirements are unchanged.
+Keep the installation's known-good `ReShade.fxh`. OpenSurface does not bundle
+or replace it. Install only the unit you intend to test, confirm a clean compile,
+and use that unit's diagnostics before judging the image.
 
-## Installation
+## Practical Detail Workflow
 
-Open the README inside the effect you want to install. Components with a
-`reshade-shaders` folder are packaged so that folder can be merged directly
-into the game's ReShade installation.
-
-OpenSurface does not bundle ReShade itself or replace the installation's
-`ReShade.fxh`. Reload ReShade after copying an effect and review its compiler
-messages before enabling it in a preset.
-
-## Suggested Detail Workflow
-
-When all three detail tools are used together, the confirmed working order is:
+The most developed combined order is:
 
 1. Guided Detail Reclamation.
 2. External Image Denoiser.
 3. Stabilized Detail Capture.
-4. Other image and color effects.
+4. Color, tone, and other intervening effects.
 5. Stabilized Detail Reapply.
 
-This is a workflow, not a hidden dependency. Every effect has an independent
-disable or removal path.
+Guided Ink Lines is optional. Lazara has no universal position: place it before
+Capture when its result should influence captured detail, or between Capture
+and Reapply when stored structure should return after color work. This is a
+recommended workflow, not a hidden dependency; every unit remains independently
+removable.
 
-## Publication Standard
+## Related Publications
 
-OpenSurface publication requires:
+- [Twin Lanterns](https://github.com/alia-june/Lunar-Flower/tree/main/Twin-Lanterns)
+  is published separately through Lunar Flower. Its page contains Stable 1.4,
+  Fidelity Overdrive, Full Resolution Dual Ray Alpha, and the versioned ReShade
+  FX include API.
+- The xOSG AI instrumentation family moved to
+  [alia-june/xOSG-prototype](https://github.com/alia-june/xOSG-prototype/tree/main/docs/xosg)
+  on 2026-11-05. No current xOSG working tree is provided by OpenSurface;
+  earlier commits remain historical repository evidence.
 
-- an explicit public file boundary;
-- preserved authorship and license continuation;
-- machine-readable SPDX metadata;
-- complete local include closure except named external dependencies;
-- source and package integrity records;
-- stated validation scope and unresolved runtime limits;
-- no credentials, private machine paths, raw workshop records, or unaccepted
-  implementation artifacts.
+## Publication And Validation
 
-See [PUBLISHING.md](PUBLISHING.md) for the public/private boundary,
-[docs/PROVENANCE.md](docs/PROVENANCE.md) for source lineage, and
-[docs/VALIDATION.md](docs/VALIDATION.md) for the current evidence ledger.
+OpenSurface preserves an explicit public boundary. Current files exclude raw
+workshop records, private machine paths, credentials, presets, logs, archives,
+and unaccepted implementation artifacts. Existing license and authorship
+obligations continue forward; publication never silently replaces them.
 
-## Validation
-
-From the repository root:
+Run the current-tree validator from the repository root:
 
 ```powershell
 python -B tools/validate_repository.py
 ```
 
-The validator checks the publication inventory, local shader includes,
-expected techniques, file-level licensing, private-path exclusions, source
-integrity, and documentation links. These checks do not replace a live ReShade
-compile, motion test, performance measurement, or visual acceptance pass.
+Current result: **18/18 passed**.
+
+The validator checks the exact effect and technique sets, documented public
+surface, local include closure, external `ReShade.fxh` boundary, source hashes,
+SPDX/license coverage, provenance identifiers, local documentation links and
+images, xOSG relocation boundary, and publication sanitation.
+
+These are structural, integrity, documentation, and bounded source checks. They
+do not prove universal ReShade compilation, game-specific depth behavior,
+motion stability, performance, memory headroom, or visual acceptance.
+
+See the [publishing boundary](PUBLISHING.md), [provenance ledger](docs/PROVENANCE.md),
+and [validation ledger](docs/VALIDATION.md) for the governing evidence and
+remaining gates.
+
+## Removal And Recovery
+
+Disable the selected technique and remove only that unit's installed files. The
+projects do not require a shared Camera Obscura runtime. Install, disable, and
+remove Stabilized Detail Capture and Reapply together. If behavior regresses,
+restore the last known-good files and technique order before changing controls.
 
 ## License
 
-Original software is available under the [MIT License](LICENSE). See
-[AUTHORS.md](AUTHORS.md), [LICENSING.md](LICENSING.md), and
+Original Camera Obscura software is available under the [MIT License](LICENSE)
+unless an individual file states otherwise. See [AUTHORS.md](AUTHORS.md),
+[LICENSING.md](LICENSING.md), and
 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for authorship, continuation,
 external dependencies, and screenshot boundaries. The repository follows the
 [REUSE specification](https://reuse.software/spec/) for machine-readable

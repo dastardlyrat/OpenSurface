@@ -13,11 +13,13 @@ helper-compiler evidence. This is not a live ReShade runtime attestation.
 
 `python -B tools/validate_repository.py`
 
-Result: 17/17 pass.
+Result: 18/18 pass.
 
 The checks cover:
 
 - five expected effect files and six expected techniques;
+- the README's four-unit, five-effect, six-support-file, and six-technique
+  inventory against the current tree;
 - a clean public file boundary with an independently installable denoiser
   package and no raw evidence, archive, log, preset, or private-path material;
 - complete local include closure except external `ReShade.fxh`;

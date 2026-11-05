@@ -307,6 +307,39 @@ def main() -> int:
     ))
 
     root_readme = (ROOT / "README.md").read_text(encoding="utf-8")
+    surface_match = re.search(
+        r"Current shader surface: \*\*(\d+) project units · (\d+) `\.fx` effect files · "
+        r"(\d+) `\.fxh`\s+API/header files · (\d+) ReShade techniques\*\*",
+        root_readme,
+    )
+    camera_root = ROOT / "Camera Obscura"
+    current_surface = (
+        sum(path.is_dir() for path in camera_root.iterdir()),
+        len(effects),
+        sum(path.suffix.lower() == ".fxh" for path in files),
+        len(techniques),
+    )
+    documented_surface = (
+        tuple(int(value) for value in surface_match.groups()) if surface_match else None
+    )
+    unit_links = (
+        "Camera%20Obscura/External%20Image%20Denoiser/",
+        "Camera%20Obscura/Guided%20Detail/",
+        "Camera%20Obscura/Stabilized%20Detail%20Cache/",
+        "Camera%20Obscura/Lazara%20Color%20Revival/",
+    )
+    surface_current = (
+        documented_surface == current_surface
+        and all(link in root_readme for link in unit_links)
+    )
+    checks.append(report(
+        "readme_current_surface",
+        surface_current,
+        f"documented={documented_surface}; actual={current_surface}; unit links=4/4"
+        if surface_current
+        else f"documented={documented_surface}; actual={current_surface}",
+    ))
+
     relocated = "https://github.com/alia-june/xOSG-prototype/tree/main/docs/xosg"
     publication_identity = (
         "storefront, not a development dump" in root_readme
