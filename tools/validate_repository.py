@@ -307,77 +307,26 @@ def main() -> int:
     ))
 
     root_readme = (ROOT / "README.md").read_text(encoding="utf-8")
-    xosg_readme = (ROOT / "xOSG" / "README.md").read_text(encoding="utf-8")
-    naked_shell_readme = (ROOT / "xOSG" / "Naked Shell" / "README.md").read_text(encoding="utf-8")
-    durable_workspace_readme = (
-        ROOT / "xOSG" / "amorphous-durable-ai-workspace" / "README.md"
-    ).read_text(encoding="utf-8")
-    synthetic_simulations_readme = (
-        ROOT / "xOSG" / "Synthetic Simulations" / "README.md"
-    ).read_text(encoding="utf-8")
-    synthetic_failure_root = (
-        ROOT / "xOSG" / "Synthetic Simulations" / "defunct-experiments" /
-        "failure" / "llm-prompt-hardening-modular-kit-v1-5-candidate"
-    )
-    synthetic_failure_readme = (
-        synthetic_failure_root / "README.md"
-    ).read_text(encoding="utf-8")
-    synthetic_failure_artifact = (
-        synthetic_failure_root / "artifact.json"
-    ).read_text(encoding="utf-8")
-    synthetic_failure_source = synthetic_failure_root / "source"
-    synthetic_source_readme = (
-        synthetic_failure_source / "README.md"
-    ).read_text(encoding="utf-8")
-    synthetic_source_manifest = synthetic_failure_source / "MANIFEST.sha256"
+    relocated = "https://github.com/alia-june/xOSG-prototype/tree/main/xOSG"
     publication_identity = (
         "storefront, not a development dump" in root_readme
         and "OpenSurface Publishing Boundary" in (ROOT / "PUBLISHING.md").read_text(encoding="utf-8")
-        and "expert Overlay System Gestalt" in xosg_readme
-        and "AI instrumentation toolset" in xosg_readme
-        and "natural-language command-line universal shell" in naked_shell_readme
-        and "Amorphous Durable AI Workspace" in durable_workspace_readme
-        and "Durable Workspace Development Kit (DWSK) 0.1.1" in durable_workspace_readme
-        and "Synthetic Simulations" in synthetic_simulations_readme
-        and "deterministic AI control-plane simulation" in synthetic_simulations_readme
-        and "can_launch: false" in synthetic_simulations_readme
-        and "7BC0651F4432F55DE1A9877DCB800723D032DC5F865A616EA9EC51A7822B6DA0"
-        in synthetic_simulations_readme
-        and "3CC411DB83C68E33FC0C8201769EA217B99C45FC508A36A56D2E478DA7BDC15B"
-        in synthetic_simulations_readme
-        and "BC1087C3332E32EE7699AB2FB79BF99134260E32A56D0198ED2CFF612436D61C"
-        in synthetic_simulations_readme
-        and "14/15 manifest hashes match" in synthetic_simulations_readme
+        and relocated in root_readme
     )
     checks.append(report(
-        "publication_and_xosg_identity",
+        "publication_and_xosg_relocation",
         publication_identity,
-        "publication purpose and xOSG identity are explicit",
+        "publication purpose and xOSG destination are explicit",
     ))
-
-    synthetic_failure_record = (
-        "failed and defunct" in synthetic_failure_readme
-        and "42/43 tests" in synthetic_failure_readme
-        and "published under the MIT License" in synthetic_failure_readme
-        and "D88D0740CD50011F3EC05C6645329D3C6A766755B0AA7A6B005335CEDE13FFE6"
-        in synthetic_failure_readme
-        and '"raw_archive_included": false' in synthetic_failure_artifact
-        and '"source_included": true' in synthetic_failure_artifact
-        and '"publication_license": "MIT"' in synthetic_failure_artifact
-        and '"repository_visibility": "private"' in synthetic_failure_artifact
-        and '"intent": "publish-cleaned-defunct-experiment"'
-        in synthetic_failure_artifact
-        and (synthetic_failure_source / "LICENSE").is_file()
-        and synthetic_source_manifest.is_file()
-        and "35/36" in synthetic_source_readme
-        and not (synthetic_failure_source / "vendor").exists()
-        and not (synthetic_failure_source / "sources").exists()
-        and not (synthetic_failure_source / "parent").exists()
+    migration_boundary = (
+        not (ROOT / "xOSG").exists()
+        and relocated in (ROOT / "docs" / "PROVENANCE.md").read_text(encoding="utf-8")
+        and relocated in (ROOT / "docs" / "VALIDATION.md").read_text(encoding="utf-8")
     )
     checks.append(report(
-        "synthetic_defunct_failure_record",
-        synthetic_failure_record,
-        "sanitized failed source, MIT license, private visibility, and exclusions are explicit",
+        "xosg_current_tree_removed",
+        migration_boundary,
+        "xOSG working tree absent; provenance and validation point to destination",
     ))
 
     balanced = all(text.count("{") == text.count("}") for text in (path.read_text(encoding="utf-8") for path in files))

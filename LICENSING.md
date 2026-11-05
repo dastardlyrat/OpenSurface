@@ -13,9 +13,9 @@ the authorship, source revision, and notices carried by each admitted project.
 - **Lazara Color Revival:** project-owned Lazara source is now expressly
   published under MIT by owner direction. The renamed refactor preserves the
   source repository and revision in the provenance ledger.
-- **xOSG:** future original implementation for Naked Shell, Amorphous Durable
-  AI Workspace, and Synthetic Simulations defaults to MIT unless a file records
-  a different SPDX expression.
+- **xOSG — relocated:** the existing MIT grant and attribution continue in the
+  [migrated family](https://github.com/alia-june/xOSG-prototype/tree/main/xOSG). Its license and original
+  notices were carried forward; the current xOSG working tree is no longer here.
 - **ReShade:** external dependency, not bundled. Its own licenses continue to
   govern it.
 - **Documentation screenshots:** excluded from the MIT software grant because
