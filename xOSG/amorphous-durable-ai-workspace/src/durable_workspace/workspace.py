@@ -14,15 +14,84 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from .canonical import dumps, loads, normalize, sha256 as canonical_sha256
+from .canonical import INT64_MAX, dumps, loads, normalize, sha256 as canonical_sha256
 from .formats import bundle, read_jsonl, read_sqlite, read_xml, write_jsonl, write_sqlite, write_xml
 
 ZERO_HASH = "0" * 64
 SCHEMA_VERSION = "DWSK-1"
+RECOVERY_MARKER = ".dwsk-recovery.json"
+RECOVERY_GUARD = "workspace has incomplete recovery; operator review required"
 
 class WorkspaceError(RuntimeError): pass
 class SnapshotError(WorkspaceError): pass
-class RecoveryError(WorkspaceError): pass
+class RecoveryError(WorkspaceError):
+    def __init__(self, message: str, details: dict[str, Any] | None = None):
+        super().__init__(message)
+        self.details = details
+
+
+def _recovery_identity(path: Path) -> tuple[int, int]:
+    if path.is_symlink() or (hasattr(path, "is_junction") and path.is_junction()) or not path.is_file():
+        raise RecoveryError("recovery marker ownership cannot be verified")
+    info = path.stat(follow_symlinks=False)
+    return info.st_dev, info.st_ino
+
+
+def _recovery_marker_present(path: Path) -> bool:
+    try:
+        path.lstat()
+    except FileNotFoundError:
+        return False
+    return True
+
+
+def _read_recovery_record(path: Path) -> dict[str, Any]:
+    _recovery_identity(path)
+    if path.stat().st_size > 65536:
+        raise RecoveryError("recovery marker exceeds its size limit")
+    record = json.loads(path.read_text(encoding="utf-8"))
+    if type(record) is not dict:
+        raise RecoveryError("recovery marker is not an object")
+    return record
+
+
+def _recovery_error_record(error: BaseException) -> dict[str, str]:
+    return {"error_type": type(error).__name__, "message": str(error)[:2048]}
+
+
+def _write_failed_recovery_record(path: Path, record: dict[str, Any], identity: tuple[int, int],
+                                  require_id: bool) -> None:
+    if _recovery_identity(path) != identity:
+        raise RecoveryError("recovery marker ownership changed")
+    if require_id and _read_recovery_record(path).get("recovery_id") != record["recovery_id"]:
+        raise RecoveryError("recovery marker ownership changed")
+    temporary = path.with_name(path.name + "." + record["recovery_id"] + ".tmp")
+    with temporary.open("xb") as handle:
+        handle.write((json.dumps(record, sort_keys=True, allow_nan=False) + "\n").encode("utf-8"))
+        handle.flush()
+        os.fsync(handle.fileno())
+    # A failed temporary record remains evidence; the original claim is retained.
+    os.replace(temporary, path)
+
+
+def _record_key(key: Any) -> str:
+    if not isinstance(key, str) or not key:
+        raise WorkspaceError("key must be a non-empty string")
+    return normalize(key)
+
+
+def _snapshot_key(key: Any, label: str) -> None:
+    try:
+        _record_key(key)
+    except WorkspaceError as exc:
+        raise SnapshotError(f"{label} must be a non-empty string") from exc
+
+
+def _snapshot_counter(value: Any, label: str, minimum: int) -> int:
+    if type(value) is not int or not minimum <= value <= INT64_MAX:
+        domain = "nonnegative" if minimum == 0 else "positive"
+        raise SnapshotError(f"{label} must be a {domain} signed 64-bit integer")
+    return value
 
 
 def _utc_now() -> str:
@@ -209,10 +278,35 @@ class DurableWorkspace:
         self.root = Path(root).resolve()
         self.db_path = self.root / "workspace.sqlite3"
         self.snapshots_dir = self.root / "snapshots"
+        self._recovery_claim = None
+        self._recovery_identity = None
+
+    def _check_recovery_guard(self) -> None:
+        marker = self.root / RECOVERY_MARKER
+        try:
+            present = _recovery_marker_present(marker)
+        except OSError as error:
+            raise WorkspaceError(RECOVERY_GUARD) from error
+        if not present:
+            if self._recovery_claim is not None:
+                raise WorkspaceError(RECOVERY_GUARD)
+            return
+        if self._recovery_claim is not None:
+            try:
+                record = _read_recovery_record(marker)
+                if (_recovery_identity(marker) == self._recovery_identity
+                        and record.get("recovery_id") == self._recovery_claim
+                        and record.get("schema") == "DWSK-RECOVERY-1"
+                        and record.get("status") == "IN_PROGRESS"):
+                    return
+            except Exception:
+                pass
+        raise WorkspaceError(RECOVERY_GUARD)
 
     @classmethod
     def init(cls, root: str | Path) -> "DurableWorkspace":
         ws = cls(root)
+        ws._check_recovery_guard()
         ws.root.mkdir(parents=True, exist_ok=True)
         ws.snapshots_dir.mkdir(exist_ok=True)
         if ws.db_path.exists():
@@ -245,6 +339,7 @@ class DurableWorkspace:
         return ws
 
     def _connect(self) -> sqlite3.Connection:
+        self._check_recovery_guard()
         if not self.db_path.exists(): raise WorkspaceError("workspace is not initialized")
         conn = sqlite3.connect(self.db_path, timeout=30)
         conn.execute("PRAGMA foreign_keys=ON")
@@ -272,9 +367,8 @@ class DurableWorkspace:
         return event
 
     def set(self, key: str, value: Any) -> dict[str, Any]:
-        key = normalize(key)
+        key = _record_key(key)
         value = normalize(value)
-        if not key: raise WorkspaceError("key must be non-empty")
         conn = self._connect()
         try:
             conn.execute("BEGIN IMMEDIATE")
@@ -292,7 +386,7 @@ class DurableWorkspace:
         finally: conn.close()
 
     def delete(self, key: str) -> dict[str, Any]:
-        key = normalize(key)
+        key = _record_key(key)
         conn = self._connect()
         try:
             conn.execute("BEGIN IMMEDIATE")
@@ -306,9 +400,10 @@ class DurableWorkspace:
         finally: conn.close()
 
     def get(self, key: str) -> Any:
+        key = _record_key(key)
         conn = self._connect()
         try:
-            row = conn.execute("SELECT value_json FROM records WHERE key=?", (normalize(key),)).fetchone()
+            row = conn.execute("SELECT value_json FROM records WHERE key=?", (key,)).fetchone()
             if row is None: raise KeyError(key)
             return loads(row[0])
         finally: conn.close()
@@ -339,18 +434,35 @@ class DurableWorkspace:
         are compared as canonical JSON so booleans and integers remain distinct.
         This does not add a new snapshot format or higher-level record schema.
         """
+        meta = data.get("meta")
+        if not isinstance(meta, dict):
+            raise SnapshotError("snapshot metadata must be an object")
+        event_count = _snapshot_counter(meta.get("event_count"), "snapshot event_count", 0)
         events = data["events"]
+        for record in data["records"]:
+            if not isinstance(record, dict):
+                raise SnapshotError("snapshot record must be an object")
+            _snapshot_key(record.get("key"), "snapshot record key")
         prev = ZERO_HASH
         expected_seq = 1
         for event in events:
-            if event["seq"] != expected_seq: raise SnapshotError("journal sequence gap")
+            if not isinstance(event, dict):
+                raise SnapshotError("journal event must be an object")
+            sequence = _snapshot_counter(event.get("seq"), "journal sequence", 1)
+            if sequence != expected_seq: raise SnapshotError("journal sequence gap")
+            if event.get("kind") in ("record.set", "record.delete"):
+                payload = event.get("payload")
+                if not isinstance(payload, dict):
+                    raise SnapshotError("journal record payload must be an object")
+                _snapshot_key(payload.get("key"), "journal record key")
+                _snapshot_counter(payload.get("revision"), "journal revision", 1)
             if event["previous_event_sha256"] != prev: raise SnapshotError("journal previous hash mismatch")
             core = {k: event[k] for k in ("seq","event_id","timestamp_utc","kind","payload","previous_event_sha256")}
             calculated = canonical_sha256(core)
             if calculated != event["event_sha256"]: raise SnapshotError("journal event hash mismatch")
             prev = calculated; expected_seq += 1
-        if data["meta"].get("journal_head") != prev: raise SnapshotError("journal head mismatch")
-        if data["meta"].get("event_count") != len(events): raise SnapshotError("event count mismatch")
+        if meta.get("journal_head") != prev: raise SnapshotError("journal head mismatch")
+        if event_count != len(events): raise SnapshotError("event count mismatch")
         state = {}
         revisions = {}
         for event in events:
@@ -473,27 +585,134 @@ class DurableWorkspace:
         # Complete consistency validation before creating or changing a target.
         state, revisions = cls._verified_replay(data)
         target = Path(target_root).resolve()
-        if target.exists() and any(target.iterdir()): raise RecoveryError("recovery target must be absent or empty")
-        target.mkdir(parents=True, exist_ok=True)
-        ws = cls.init(target)
-        # Replace the fresh DB with reconstructed durable state.
-        ws.db_path.unlink()
-        conn = sqlite3.connect(ws.db_path)
+        if target.exists() and (not target.is_dir() or any(target.iterdir())):
+            raise RecoveryError("recovery target must be absent or empty")
+        ws = cls(target)
+        marker = target / RECOVERY_MARKER
+        recovery_id = uuid.uuid4().hex
+        receipt = {"schema": "DWSK-RECOVERY-1", "recovery_id": recovery_id,
+                   "status": "IN_PROGRESS", "phase": "claimed", "expected_logical_digest": digest}
+        phase = "create_target"
+        claimed = False
+        claim_confirmed = False
+        identity = None
+        conn = None
+        connection_closed = True
+        verified = False
         try:
+            target.mkdir(parents=True, exist_ok=True)
+            phase = "claim"
+            with marker.open("xb") as handle:
+                claimed = True
+                info = os.fstat(handle.fileno())
+                identity = (info.st_dev, info.st_ino)
+                ws._recovery_claim = recovery_id
+                ws._recovery_identity = identity
+                handle.write((json.dumps(receipt, sort_keys=True) + "\n").encode("utf-8"))
+                handle.flush()
+                os.fsync(handle.fileno())
+                claim_confirmed = True
+            phase = "destination_check"
+            if set(path.name for path in target.iterdir()) != {RECOVERY_MARKER}:
+                raise RecoveryError("recovery target changed after claim")
+            ws.snapshots_dir.mkdir(exist_ok=False)
+            phase = "database_open"
+            conn = sqlite3.connect(ws.db_path)
+            connection_closed = False
+            phase = "schema"
             conn.executescript("""
             PRAGMA journal_mode=WAL; PRAGMA synchronous=FULL;
             CREATE TABLE workspace_meta(key TEXT PRIMARY KEY, value TEXT NOT NULL);
             CREATE TABLE records(key TEXT PRIMARY KEY, value_json TEXT NOT NULL, revision INTEGER NOT NULL);
             CREATE TABLE journal(seq INTEGER PRIMARY KEY,event_id TEXT NOT NULL UNIQUE,timestamp_utc TEXT NOT NULL,kind TEXT NOT NULL,payload_json TEXT NOT NULL,previous_event_sha256 TEXT NOT NULL,event_sha256 TEXT NOT NULL UNIQUE);
             """)
+            phase = "metadata"
             for k,v in data["meta"].items():
                 if k not in ("journal_head","event_count"): conn.execute("INSERT INTO workspace_meta VALUES (?,?)", (k, str(v)))
             # Preserve the checked chain exactly and use its replayed state.
+            phase = "events"
             for event in data["events"]:
                 p = event["payload"]; kind = event["kind"]
                 conn.execute("INSERT INTO journal VALUES (?,?,?,?,?,?,?)", (event["seq"],event["event_id"],event["timestamp_utc"],kind,dumps(p),event["previous_event_sha256"],event["event_sha256"]))
+            phase = "records"
             for key,value in state.items(): conn.execute("INSERT INTO records VALUES (?,?,?)", (key,dumps(value),revisions[key]))
+            phase = "commit"
             conn.commit()
-        finally: conn.close()
-        ws.verify()
-        return ws
+            phase = "database_close"
+            conn.close()
+            conn = None
+            connection_closed = True
+            phase = "verify"
+            if ws.verify()["logical_digest"] != digest:
+                raise RecoveryError("recovered logical digest differs from snapshot")
+            verified = True
+            phase = "complete"
+            ws._check_recovery_guard()
+            marker.unlink()
+            return ws
+        except BaseException as primary:
+            secondary = []
+            if conn is not None:
+                for attempt in range(2):
+                    try:
+                        conn.close()
+                        connection_closed = True
+                        conn = None
+                        break
+                    except Exception as error:
+                        secondary.append({"stage": "builder_connection_close", **_recovery_error_record(error)})
+            failure_record = {**receipt, "status": "FAILED", "phase": phase,
+                              "primary_error": _recovery_error_record(primary),
+                              "secondary_errors": list(secondary), "builder_connection_closed": connection_closed,
+                              "verification_completed": verified, "claim_confirmed": claim_confirmed}
+            if claimed:
+                try:
+                    if _recovery_marker_present(marker):
+                        _write_failed_recovery_record(marker, failure_record, identity, claim_confirmed)
+                    else:
+                        # A namespace error may have removed the claim. Recreate exclusively,
+                        # never replace somebody else's claim; report failure if this is uncertain.
+                        with marker.open("xb") as handle:
+                            handle.write((json.dumps(failure_record, sort_keys=True) + "\n").encode("utf-8"))
+                            handle.flush()
+                            os.fsync(handle.fileno())
+                except Exception as error:
+                    secondary.append({"stage": "failure_receipt", **_recovery_error_record(error)})
+            marker_state = "ABSENT"
+            present = None
+            try:
+                present = _recovery_marker_present(marker)
+                if present:
+                    current = _read_recovery_record(marker)
+                    marker_state = current.get("status", "UNRECOGNIZED") if current.get("recovery_id") == recovery_id else "FOREIGN"
+            except Exception as error:
+                marker_state = "UNREADABLE_OR_UNVERIFIED"
+                secondary.append({"stage": "marker_state", **_recovery_error_record(error)})
+            if present is None:
+                target_state = "GUARD_UNCERTAIN"
+            elif present:
+                target_state = "RETAINED_INCOMPLETE" if claimed else "UNCLAIMED_OCCUPIED"
+            elif verified:
+                target_state = "VERIFIED_UNACKNOWLEDGED"
+            elif claimed:
+                target_state = "GUARD_UNCERTAIN"
+            else:
+                try:
+                    target_state = "EMPTY_UNCLAIMED" if target.is_dir() and not any(target.iterdir()) else "UNCLAIMED_OCCUPIED_OR_ABSENT"
+                except OSError:
+                    target_state = "UNCLAIMED_STATE_UNVERIFIED"
+            details = {"status": "RECOVERY_INCOMPLETE", "phase": phase, "recovery_id": recovery_id,
+                       "target_name": target.name, "claimed": claimed, "claim_confirmed": claim_confirmed,
+                       "marker_state": marker_state, "target_state": target_state,
+                       "builder_connection_closed": connection_closed, "verification_completed": verified,
+                       "primary_error": _recovery_error_record(primary), "secondary_errors": secondary}
+            if not isinstance(primary, Exception):
+                primary.add_note("Recovery did not return success; retained state requires operator review")
+                raise
+            error = RecoveryError("recovery incomplete; retained destination requires operator review", details)
+            if conn is not None:
+                error.resource_owner = conn
+            raise error from primary
+        finally:
+            ws._recovery_claim = None
+            ws._recovery_identity = None

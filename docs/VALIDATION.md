@@ -93,34 +93,18 @@ ReShade gates.
 
 ## Amorphous Durable AI Workspace checks
 
-The staged DWSK 0.1.1 component was checked directly from its OpenSurface
-source tree on Windows with Python 3.14.
+### R4 source-adoption review — 2026-11-04
 
-Unit suite, with the source-layout import root made explicit:
+The R4 repairs were adopted into the DWSK 0.1.1 source base in this private review branch, preserving the newer repository work. Exact runtime/checker and helper identity checks accompanied fresh ordinary and optimized qualification on Windows.
 
-`$env:PYTHONPATH='src'; python -B -W error -m unittest discover -s tests -v`
+- R4 suite: 122/122 per mode, 244 checks total, covering recovery, value admission, worker cleanup, checker controls, units and self-checks.
+- Added fixed development runner: 17 units plus seven self-checks per mode, 48 overlapping checks total.
+- Required acceptance: exact test identities/counts, actual mode, intended refusal cause and complete owned cleanup evidence.
+- Source inventory: regenerated against the adopted curated bytes; it excludes its own checksum file.
 
-Result: 17/17 pass.
+The [component validation report](../xOSG/amorphous-durable-ai-workspace/VALIDATION_REPORT.md) describes the set and limits. The [development runner](../xOSG/amorphous-durable-ai-workspace/tools/validation/README.md) runs only the fixed unit/self-check suites. The full fault campaign's raw evidence remains in private custody and is not included in this tree.
 
-Component self-validation:
-
-`python -B -W error validate.py`
-
-Result: 7/7 pass, including four concurrent writers and 200 commits, snapshot
-verification, recovery after loss of each individual representation, and
-runtime journal-tamper detection.
-
-All 32 entries in `SOURCE_SHA256SUMS` matched the staged file bytes.
-
-The first unit invocation omitted `src` from Python's import path and stopped
-with two test-module import errors. No test body ran. The corrected source-tree
-invocation above passed all 17 tests; the initial failure is retained here to
-distinguish invocation setup from implementation behavior.
-
-These fresh checks support the staged source on this machine. They do not
-repeat the retained 1,000-case fuzzy campaign, installed-wheel checks, native
-mutex campaign, physical power-loss testing, cross-platform testing, or
-application integration recorded or bounded by the component reports.
+These are source-adoption checks, not a fresh binary release. The older 2026-10-31 source/install results, initial import-path invocation failure and original binary identifiers remain historical evidence in the component reports. This adoption does not reproduce the historical fuzzy/installed/native-mutex campaigns or establish physical power-loss durability, every supported OS/interpreter, external-tool isolation or logger/application integration.
 
 ## Runtime evidence
 
