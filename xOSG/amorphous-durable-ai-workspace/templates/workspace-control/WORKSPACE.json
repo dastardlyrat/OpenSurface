@@ -1,7 +1,0 @@
-{
-  "schema": "DWSK-WORKSPACE-CONTROL-1",
-  "status": "ACTIVE",
-  "durability_backend": "durable-workspace-development-kit",
-  "semantic_authority": false,
-  "source_control_expected": true
-}

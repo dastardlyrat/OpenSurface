@@ -1,5 +1,9 @@
 # Validation Record
 
+## Current-tree relocation — 2026-11-05
+
+The xOSG family now lives in [alia-june/xOSG-prototype](https://github.com/alia-june/xOSG-prototype/tree/main/xOSG). The source cleanup removes its current working tree only after destination verification. The records below describe their dated earlier source states; their counts do not describe the remaining OpenSurface file inventory. The migration validation summary records fresh fixed DWSK checks. Camera Obscura source and its live runtime gates are unchanged.
+
 Date: 2026-11-01
 
 Truth state: local structural, integrity, compatibility-compiler, and strict
@@ -102,7 +106,7 @@ The R4 repairs were adopted into the DWSK 0.1.1 source base in this private revi
 - Required acceptance: exact test identities/counts, actual mode, intended refusal cause and complete owned cleanup evidence.
 - Source inventory: regenerated against the adopted curated bytes; it excludes its own checksum file.
 
-The [component validation report](../xOSG/amorphous-durable-ai-workspace/VALIDATION_REPORT.md) describes the set and limits. The [development runner](../xOSG/amorphous-durable-ai-workspace/tools/validation/README.md) runs only the fixed unit/self-check suites. The full fault campaign's raw evidence remains in private custody and is not included in this tree.
+The [component validation report](https://github.com/alia-june/xOSG-prototype/blob/main/xOSG/amorphous-durable-ai-workspace/VALIDATION_REPORT.md) describes the set and limits. The [development runner](https://github.com/alia-june/xOSG-prototype/blob/main/xOSG/amorphous-durable-ai-workspace/tools/validation/README.md) runs only the fixed unit/self-check suites. The full fault campaign's raw evidence remains in private custody and is not included in this tree.
 
 These are source-adoption checks, not a fresh binary release. The older 2026-10-31 source/install results, initial import-path invocation failure and original binary identifiers remain historical evidence in the component reports. This adoption does not reproduce the historical fuzzy/installed/native-mutex campaigns or establish physical power-loss durability, every supported OS/interpreter, external-tool isolation or logger/application integration.
 

@@ -1,5 +1,9 @@
 # Provenance
 
+## xOSG relocation — 2026-11-05
+
+The reviewed `xOSG/` working tree from revision `276957db0f374edf6fc02b6919e2ec42c8960290` moved to [alia-june/xOSG-prototype](https://github.com/alia-june/xOSG-prototype/tree/main/xOSG). Its migration manifest records all 100 files and relocation edits. The original MIT notice continues. Earlier xOSG entries below are retained as historical records, including superseded publication states. The source history and private workshop evidence remain preserved.
+
 Date: 2026-10-31
 
 ## Guided Detail

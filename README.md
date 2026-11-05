@@ -1,7 +1,7 @@
 # OpenSurface
 
-OpenSurface is the public home for finished, inspectable tools developed through
-the Camera Obscura and xOSG projects.
+OpenSurface hosts the Camera Obscura publication tree. The xOSG AI instrumentation
+family has moved to [alia-june/xOSG-prototype](https://github.com/alia-june/xOSG-prototype/tree/main/xOSG).
 
 This repository is a storefront, not a development dump. Each published unit
 must be independently understandable, installable, removable, licensed, and
@@ -21,7 +21,7 @@ continue forward; publication never silently replaces them.
 | [Guided Detail](Camera%20Obscura/Guided%20Detail/) | Same-surface detail reclamation and guided line emphasis | Published source with diagnostic workflow |
 | [Stabilized Detail Cache](Camera%20Obscura/Stabilized%20Detail%20Cache/) | Captures bounded signed detail and restores it later in the chain | Live compile and visual pass recorded |
 | [Lazara Color Revival](Camera%20Obscura/Lazara%20Color%20Revival/) | Recovers muted source color or deliberately removes it | Refactored candidate; live regression still required |
-| [xOSG](xOSG/) | **expert Overlay System Gestalt**, the AI instrumentation family for Naked Shell, Amorphous Durable AI Workspace, and Synthetic Simulations | DWSK 0.1.1 published; Synthetic Simulations architecture and bounded evidence documented |
+| [xOSG — relocated](https://github.com/alia-june/xOSG-prototype/tree/main/xOSG) | AI instrumentation: Naked Shell, Amorphous Durable AI Workspace / DWSK, and Synthetic Simulations | Maintained in alia-june/xOSG-prototype; no current xOSG working tree here |
 
 ## Camera Obscura
 
@@ -67,22 +67,11 @@ admitted chroma while preserving source luma.
 
 ![Lazara Color Revival comparison](Camera%20Obscura/Lazara%20Color%20Revival/docs/images/lazara-color-revival-comparison.png)
 
-## xOSG
+## xOSG — relocated
 
-xOSG, **expert Overlay System Gestalt**, is the OpenSurface family for AI
-instrumentation. Its current members are Naked Shell, Amorphous Durable AI
-Workspace, and
-[Synthetic Simulations](xOSG/Synthetic%20Simulations/).
+The reviewed current xOSG family moved to [alia-june/xOSG-prototype](https://github.com/alia-june/xOSG-prototype/tree/main/xOSG) on 2026-11-05, including the merged DWSK R4 source, Naked Shell identity, and Synthetic Simulations documentation and sanitized failed experiment.
 
-Amorphous Durable AI Workspace contains the Durable Workspace Development Kit
-(DWSK) 0.1.1: a Python library and command-line tool for transactional project
-state, hash-chained journals, verified snapshots, and quorum recovery.
-
-Synthetic Simulations has an exercised v0.4 private prototype: a deterministic,
-non-launching AI control-plane simulation with closed contracts, pinned input
-hashes, bounded role authority, and inspectable decision traces. Its source is
-not yet promoted into the storefront; the public project page records the
-verified architecture, evidence ceiling, and remaining publication gates.
+The public destination records source lineage, license continuation, imported-file identities, privacy-review limits, and fresh fixed DWSK source checks. This repository's earlier commits remain historical evidence. Camera Obscura source and its validation requirements are unchanged.
 
 ## Installation
 

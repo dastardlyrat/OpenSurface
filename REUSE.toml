@@ -19,7 +19,6 @@ path = [
   "Camera Obscura/External Image Denoiser/**",
   "Camera Obscura/Stabilized Detail Cache/**",
   "Camera Obscura/Lazara Color Revival/**",
-  "xOSG/**",
   "docs/**",
   "tools/**"
 ]
