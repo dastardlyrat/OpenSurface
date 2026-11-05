@@ -85,7 +85,10 @@ def _parse_xml_value(parent: ET.Element) -> Any:
     if node.tag == "bool":
         if node.text not in ("true", "false"): raise ValueError("invalid boolean")
         return node.text == "true"
-    if node.tag == "int": return int(node.text or "0")
+    if node.tag == "int":
+        if node.text is None or node.text == "":
+            raise ValueError("XML integer text must be present")
+        return int(node.text)
     if node.tag == "str":
         if node.attrib.get("encoding") != "base64-utf8": raise ValueError("unsupported XML string encoding")
         return base64.b64decode((node.text or "").encode("ascii"), validate=True).decode("utf-8")

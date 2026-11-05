@@ -13,7 +13,40 @@ ROOT = Path(__file__).resolve().parent
 SRC = ROOT / "src"
 sys.path.insert(0, str(SRC))
 
-from durable_workspace import DurableWorkspace
+from durable_workspace import DurableWorkspace, SnapshotError
+
+
+def require_intact_snapshot(snapshot: Path) -> None:
+    """This self-check publishes three intact formats, so require all three."""
+    report = DurableWorkspace.inspect_snapshot(snapshot)
+    if type(report) is not dict:
+        raise RuntimeError("snapshot inspection report must be an object")
+    digest = report.get("quorum_digest")
+    if (type(digest) is not str or len(digest) != 64
+            or any(character not in "0123456789abcdef" for character in digest)):
+        raise RuntimeError("published snapshot has no valid quorum digest")
+    if report.get("manifest_digest_matches_quorum") is not True:
+        raise RuntimeError("published snapshot manifest does not match quorum")
+    kinds = report.get("quorum_kinds")
+    expected = {"sqlite", "jsonl", "xml"}
+    if (type(kinds) is not list or len(kinds) != 3
+            or any(type(kind) is not str for kind in kinds) or set(kinds) != expected):
+        raise RuntimeError("published snapshot requires all three agreeing formats")
+    representations = report.get("representations")
+    if (type(representations) is not dict or set(representations) != expected
+            or any(type(result) is not dict or result.get("valid") is not True
+                   for result in representations.values())):
+        raise RuntimeError("published snapshot has an invalid representation")
+
+
+def require_journal_hash_rejection(workspace: DurableWorkspace) -> None:
+    try:
+        workspace.verify()
+    except SnapshotError as exc:
+        if str(exc) != "journal event hash mismatch":
+            raise RuntimeError("journal tamper failed for an unexpected reason") from exc
+        return
+    raise RuntimeError("journal tamper was not detected")
 
 
 def worker(root: str, worker_id: int, n: int) -> None:
@@ -47,7 +80,7 @@ def main() -> int:
 
         ws.set("edge/control", {"text": "nul\u0000 newline\n emoji🙂", "flags": [True, False, None], "n": 9})
         snapshot = ws.checkpoint()
-        check("published snapshot verifies", lambda: DurableWorkspace.inspect_snapshot(snapshot))
+        check("published snapshot verifies", lambda: require_intact_snapshot(snapshot))
 
         for victim in ("snapshot.sqlite3", "snapshot.jsonl", "snapshot.xml"):
             def recover_one(victim=victim):
@@ -70,11 +103,7 @@ def main() -> int:
             try:
                 conn.execute("UPDATE journal SET event_sha256=? WHERE seq=1", ("f"*64,)); conn.commit()
             finally: conn.close()
-            try:
-                DurableWorkspace(bad).verify()
-            except Exception:
-                return
-            raise RuntimeError("journal tamper was not detected")
+            require_journal_hash_rejection(DurableWorkspace(bad))
         check("runtime journal tamper detection", journal_tamper)
 
     width = max(len(n) for n,_,_ in checks)

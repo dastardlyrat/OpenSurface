@@ -2,7 +2,7 @@ from __future__ import annotations
 import argparse, json, sys
 from pathlib import Path
 from .canonical import loads
-from .workspace import DurableWorkspace
+from .workspace import DurableWorkspace, RecoveryError
 
 
 def main(argv=None) -> int:
@@ -29,6 +29,10 @@ def main(argv=None) -> int:
         elif ns.cmd=="recover": print(DurableWorkspace.recover(ns.snapshot_dir, ns.target_root).root)
         return 0
     except Exception as exc:
+        if isinstance(exc, RecoveryError) and exc.details is not None:
+            print(json.dumps({"error_type": "RecoveryError", "error": str(exc), "details": exc.details},
+                             ensure_ascii=False, sort_keys=True), file=sys.stderr)
+            return 2
         print(f"ERROR: {exc}", file=sys.stderr); return 2
 
 if __name__ == "__main__": raise SystemExit(main())

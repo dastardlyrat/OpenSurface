@@ -1,3 +1,11 @@
+# Build status for R4 source adoption — 2026-11-04
+
+The current review revision changes source and development tools. No replacement wheel, sdist, source ZIP, installed-wheel test, package version or release tag was produced by this adoption. Current source checks are recorded in [VALIDATION_REPORT.md](VALIDATION_REPORT.md).
+
+The earlier artifact inventory and distribution checksums describe the original 2026-10-31 binary set retained outside this repository. They are historical identifiers, not a claim that those binaries contain the adopted R4 changes. SOURCE_SHA256SUMS is the current source inventory. A new binary release needs its own build, package-content and outside-source installation validation.
+
+## Historical binary build record
+
 # DWSK 0.1.1 build report — 2026-10-31
 
 **Build and installed-package validation: PASS.** The wheel and source distribution

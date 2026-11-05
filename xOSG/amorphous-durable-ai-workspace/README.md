@@ -8,6 +8,12 @@ The kit combines a SQLite runtime database with three snapshot representations a
 
 **Guide:** [Capabilities](#capabilities) · [Installation](#installation-from-source) · [Example](#a-complete-storage-and-recovery-example) · [API](#python-api) · [CLI](#command-line-reference) · [Storage](#storage-layout) · [Publication](#checkpoint-publication) · [Recovery](#verification-and-recovery) · [Validation](#validation-record) · [Project files](#project-files)
 
+## R4 source adoption
+
+This review revision adopts the qualified R4 value-admission, checker and retained-recovery repairs on the DWSK 0.1.1 source base. Keys must be nonempty strings; malformed XML integer text and non-integer counters are refused. Recovery exclusively claims a target, retains failed/interrupted targets for operator review, and blocks ordinary DWSK access while a recovery marker is present or uncheckable. See [DURABILITY_CONTRACT.md](DURABILITY_CONTRACT.md) and [RECOVERY_PLAYBOOK.md](RECOVERY_PLAYBOOK.md).
+
+The [development runner](tools/validation/README.md) supplies owned Windows unit/self-check execution. These are development tools; the runtime remains standard-library-only. Current validation is source validation. The older installed-wheel reports and binary artifact hashes below remain historical; no new wheel, version, release tag or installed-package result is claimed by this source adoption.
+
 ## Capabilities
 
 - Initialize an isolated workspace at a configured filesystem path.
@@ -214,6 +220,17 @@ Ordinary exception cleanup and forced termination are different cases: a killed 
 Hashes and agreement establish the stated consistency checks, not authorship or truth of record contents. Windows directory-handle synchronization is not implemented. The tests do not establish physical power-loss durability, storage-device failure tolerance, or independent backup recovery.
 
 ## Validation record
+
+### R4 source adoption — 2026-11-04
+
+The adopted runtime, checker and repaired process helpers passed the complete 244-case R4 qualification across ordinary and optimized Python: 24 recovery, 32 value-admission, 16 worker-lifecycle, 26 checker-control, 17 unit and seven self-check cases per mode. The added development runner separately passed the existing 17 units and seven self-checks in both modes (48 overlapping checks). These counts overlap and are not independent campaigns.
+
+The recovery controls include real owned interruptions and competing workers, plus finite injected database/filesystem failures. Qualified executable bytes were verified against the review tree. The complete raw records remain outside the repository; the bounded result is recorded in [VALIDATION_REPORT.md](VALIDATION_REPORT.md) and the repository [validation ledger](../../docs/VALIDATION.md).
+
+These are source checks, not rebuilt-wheel checks. The runtime remains standard-library-only; owned development execution is Windows-qualified. Physical power-loss durability, hostile filesystem races, external-tool coordination and application/logger integration are outside the claim.
+
+### Historical source and installed-build evidence
+
 
 Source validation and installed-wheel validation are recorded separately:
 

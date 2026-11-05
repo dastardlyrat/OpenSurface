@@ -82,6 +82,19 @@ repository, commit, and original authorship remain recorded above.
 
 ### Amorphous Durable AI Workspace
 
+#### R4 source-adoption review — 2026-11-04
+
+- Source basis: the qualified R4 repair candidate, preserving R1–R3 behavior and its original source identities.
+- Adopted surface: workspace value/recovery implementation, formats, CLI, validation checker, durability contract and recovery playbook.
+- Development surface: the two repaired owned-execution helpers under component tools/validation, with a fixed unit/self-check entrypoint and source-only documentation.
+- Review base: current private OpenSurface main; all unrelated source and publication records retained.
+- Fresh source evidence: 244 R4 checks plus 48 overlapping fixed-entrypoint checks across ordinary and optimized Python; see the component validation report and repository validation ledger.
+- Binary evidence boundary: old wheel/sdist identities remain historical; no new package release or installed-wheel result is claimed.
+- License continuation: the existing repository MIT annotation covers xOSG source and development tooling; existing notices remain intact.
+- Authority boundary: reviewed source adoption only; no logger integration, automatic conversation service, semantic/governance authority or default-branch merge is implied.
+
+#### Earlier source-import record
+
 - Published component: Durable Workspace Development Kit (DWSK) 0.1.1
 - Source import: repository commit
   `4c3d8e71d4dc61c2a5d86d5eeeecebb8ea4dd02a` populated the bounded xOSG

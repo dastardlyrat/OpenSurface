@@ -15,6 +15,30 @@ and existing `record.set` / `record.delete` interpretation are unchanged.
 ## Canonical data rule
 All journal payloads and snapshot logical content use DWSK-CJ-1: NFC strings/keys, sorted object keys, arrays in order, null/boolean/string/signed-64-bit integers only, UTF-8, no whitespace. Floats are rejected.
 
+## Key and counter admission
+
+Public `set`, `get`, and `delete` keys must be nonempty strings, including string
+subclasses accepted by the canonical normalizer. API keys are NFC-normalized.
+Invalid keys raise WorkspaceError before database access or mutation. A valid
+missing get still raises KeyError; a valid absent delete still journals an event.
+Snapshot record keys and recognized set/delete event keys obey the same
+string/nonempty domain. Payload null, false, zero, empty strings and collections
+remain valid canonical data, including empty string keys inside payload objects.
+
+Snapshot event_count must be an actual integer from zero through INT64_MAX and
+equal the number of events. Journal sequence numbers are actual positive
+integers through INT64_MAX, consecutive from one. Recognized set/delete event
+revisions are actual positive integers through INT64_MAX. These metadata fields
+exclude booleans and integer subclasses. The existing delete/recreate revision
+behavior is unchanged; no new monotonic revision-history rule is introduced.
+Missing or invalid key/counter fields raise SnapshotError during bundle
+verification, before recovery can create a target. Snapshot inspection marks
+such representations invalid; recovery retains its existing quorum refusal.
+
+Typed XML integers require present, nonempty text; absence is never converted to
+zero. Existing conversion of other nonempty integer text and signed-64-bit
+canonical normalization are retained. Empty base64 string encodings remain valid.
+
 ## Snapshot publication state machine
 1. Read one consistent logical bundle from the runtime database.
 2. Create `snapshots/.staging-<generation>`.
@@ -97,3 +121,31 @@ one workspace share that storage location.
 A representation is eligible only if its file hash/size match the published manifest, it parses, its journal chain verifies, and its current values agree with journal replay. Automatic recovery requires at least **two eligible representations with the same logical digest**, and that digest must equal the published manifest logical digest. Replay consistency is checked before creating or changing a recovery target.
 
 There is no intrinsic SQLite/JSONL/XML precedence. If quorum cannot be established, recovery stops for explicit operator review.
+
+Recovery accepts an absent or empty destination, validates the source first, then
+exclusively creates `.dwsk-recovery.json` before database construction. Ordinary
+DWSK init/get/set/delete/verify/checkpoint refuse any marked workspace, including
+an unreadable marker. Only the active instance owning the current claim performs
+internal verification. This protocol coordinates cooperating DWSK calls; it is
+not an operating-system access restriction.
+
+The recovered database is built once, closed, and verified against the expected
+logical digest before the owned marker is removed and a usable workspace is
+returned. Invalid preflight and occupied-target errors retain their previous
+messages. A competing claim is never overwritten or removed.
+
+Failure retains generated files and the recovery claim for operator review.
+RecoveryError details and recovery CLI errors report RECOVERY_INCOMPLETE, phase,
+original/secondary errors, builder closure and last confirmed marker/target state;
+CLI exit remains 2. A FAILED receipt is published atomically for an owned marker;
+if that fails, the original IN_PROGRESS claim and any temporary receipt remain
+evidence. Claim/reporting uncertainty is reported explicitly. No automatic resume,
+marker removal, failed-target cleanup or adoption occurs.
+
+Process interruption before completion leaves an incomplete destination guarded
+by its persistent claim. Namespace errors can make guard presence uncertain;
+errors never claim protection that was not observed. Interruption after verified
+marker removal can leave a complete workspace without an acknowledged return.
+File fsync is used for claim/receipt writes; the existing Windows directory-sync
+and physical-power-loss proof limits still apply. This is not exhaustive hostile
+path-race or external-writer coordination.
