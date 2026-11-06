@@ -1,10 +1,37 @@
 // SPDX-FileCopyrightText: 2026 dastardlyrat and OpenSurface contributors
 // SPDX-License-Identifier: MIT
-// Generated example consumer; copy to reshade-shaders/Shaders and remove .example.
+//
+// TWIN LANTERN PROVIDER PARITY INSPECTOR
+// --------------------------------------
+// This generated teaching consumer sends one receiver, direction, ray budget,
+// and tolerance set to both DDA and March, then visualizes where their evidence
+// agrees or diverges.
+//
+// CONTRACT STATUS
+//   CAMERA_OBSCURA_API_TwinLanternParity.fxh is present in the OpenSurface
+//   development snapshot, but its parity record and builder are not among the
+//   twelve stable symbols registered by Twin Lanterns API 0.1.0. This example
+//   is therefore an explicitly adopted development extension.
+//
+// WHAT THIS EXAMPLE DOES NOT DO
+//   * It does not transport donor color into the source image.
+//   * It does not select a winning provider.
+//   * It does not prove that either provider is correct merely because both
+//     providers agree.
+//   * It does not turn invalid depth into a usable receiver.
+//
+// Copy this file into reshade-shaders/Shaders and remove the final .example
+// suffix only when you deliberately want the diagnostic technique.
 
+// ReShade supplies back-buffer/depth access and the full-screen vertex shader.
 #include "ReShade.fxh"
+
+// This specialized header builds the shared ray, dispatches both providers,
+// refines both results, and returns comparison evidence rather than a color.
 #include "camera_obscura/api/CAMERA_OBSCURA_API_TwinLanternParity.fxh"
 
+// Eight integer indices map to the compass directions defined by the API:
+// east, northeast, north, northwest, west, southwest, south, southeast.
 uniform int CAMERA_OBSCURA_EX_TLParityDirection
 <
     ui_type = "slider";
@@ -14,6 +41,11 @@ uniform int CAMERA_OBSCURA_EX_TLParityDirection
     ui_max = 7;
 > = 0;
 
+// The non-live cases are intentional negative controls:
+//   0 = use the configured live depth receiver;
+//   1 = force receiver invalidity;
+//   2 = force a zero direction and therefore an invalid ray.
+// A useful diagnostic must show these failures rather than hiding them.
 uniform int CAMERA_OBSCURA_EX_TLParityInput
 <
     ui_type = "combo";
@@ -22,6 +54,8 @@ uniform int CAMERA_OBSCURA_EX_TLParityInput
     ui_items = "Live Depth\0Forced Invalid Receiver\0Forced Zero Direction\0";
 > = 0;
 
+// Every view is diagnostic-only. None is fed back into provider authority or
+// composited as light. Channel meanings are documented beside each branch.
 uniform int CAMERA_OBSCURA_EX_TLParityView
 <
     ui_type = "combo";
@@ -30,6 +64,8 @@ uniform int CAMERA_OBSCURA_EX_TLParityView
     ui_items = "Provider Outcome\0Agreement Channels\0Conflict\0Confidence\0Endpoint\0Source\0";
 > = 0;
 
+// The builder clamps this request to the supported DDA step ceiling. Keeping
+// the UI range at 1..24 makes that bounded workload visible to the tester.
 uniform float CAMERA_OBSCURA_EX_TLParityRayPixels
 <
     ui_type = "slider";
@@ -40,6 +76,9 @@ uniform float CAMERA_OBSCURA_EX_TLParityRayPixels
     ui_step = 1.0;
 > = 16.0;
 
+// Encode the four mutually exclusive hit-presence states as categories:
+//   green = both hit, blue = DDA only, orange = March only, charcoal = neither.
+// This view says nothing about whether two hits agree on location or depth.
 float3 CAMERA_OBSCURA_EX_TLParityOutcome(
     CAMERA_OBSCURA_API_TwinLanternParityEvidence evidence)
 {
@@ -50,29 +89,39 @@ float3 CAMERA_OBSCURA_EX_TLParityOutcome(
         float3(0.16, 0.16, 0.20) * evidence.neither_hit);
 }
 
+// Standard ReShade post-process signature. Position is retained for a familiar
+// consumer shape even though this diagnostic needs only normalized UV.
 float4 CAMERA_OBSCURA_API_TwinLanternParityExample_PS(
     float4 position : SV_Position,
     float2 uv : TEXCOORD) : SV_Target
 {
+    // Source is used only as visual context for Conflict and Source views.
     float4 source = tex2D(ReShade::BackBuffer, uv);
+
+    // The builder creates one ray/control set and dispatches both providers.
+    // Literal arguments are kept adjacent to their meaning here so a tester can
+    // change one variable deliberately rather than guessing at hidden defaults.
     CAMERA_OBSCURA_API_TwinLanternParityEvidence evidence =
         CAMERA_OBSCURA_API_BuildTwinLanternParityEvidence(
-            uv,
-            (float)CAMERA_OBSCURA_EX_TLParityDirection,
-            (float)CAMERA_OBSCURA_EX_TLParityInput,
-            CAMERA_OBSCURA_EX_TLParityRayPixels,
-            0.15,
-            0.0005,
-            0.0035,
-            8.0,
-            0.015,
-            8.0);
+            uv,                                           // receiver UV
+            (float)CAMERA_OBSCURA_EX_TLParityDirection,   // compass index
+            (float)CAMERA_OBSCURA_EX_TLParityInput,       // live or negative control
+            CAMERA_OBSCURA_EX_TLParityRayPixels,          // bounded travel in pixels
+            0.15,                                         // ray depth slope
+            0.0005,                                       // front interval bias
+            0.0035,                                       // back interval thickness
+            8.0,                                          // UV agreement tolerance, pixels
+            0.015,                                        // depth agreement tolerance
+            8.0);                                         // distance tolerance, pixels
     float3 outputColor;
 
+    // Categorical presence answers only: which provider reported a hit?
     if (CAMERA_OBSCURA_EX_TLParityView == 0)
     {
         outputColor = CAMERA_OBSCURA_EX_TLParityOutcome(evidence);
     }
+    // Agreement channels are independent:
+    //   red = UV agreement, green = depth agreement, blue = distance agreement.
     else if (CAMERA_OBSCURA_EX_TLParityView == 1)
     {
         outputColor = float3(
@@ -80,6 +129,8 @@ float4 CAMERA_OBSCURA_API_TwinLanternParityExample_PS(
             evidence.depth_agreement,
             evidence.distance_agreement);
     }
+    // Conflict is overlaid in red on a dim source anchor. A provider split or
+    // an exceeded tolerance can raise it; zero does not prove scene truth.
     else if (CAMERA_OBSCURA_EX_TLParityView == 2)
     {
         outputColor = lerp(
@@ -87,6 +138,8 @@ float4 CAMERA_OBSCURA_API_TwinLanternParityExample_PS(
             float3(1.0, 0.04, 0.02),
             saturate(evidence.conflict));
     }
+    // Confidence channels:
+    //   red = DDA, green = March, blue = the weaker of the two.
     else if (CAMERA_OBSCURA_EX_TLParityView == 3)
     {
         outputColor = float3(
@@ -94,20 +147,27 @@ float4 CAMERA_OBSCURA_API_TwinLanternParityExample_PS(
             evidence.march_confidence,
             min(evidence.dda_confidence, evidence.march_confidence));
     }
+    // Endpoint view stores resolved endpoint U in red, V in green, and ray
+    // validity in blue. It helps separate bad direction/ray input from misses.
     else if (CAMERA_OBSCURA_EX_TLParityView == 4)
     {
         outputColor = float3(
             evidence.endpoint_uv_resolved,
             evidence.ray_valid);
     }
+    // Source is the control view. If it is wrong, fix the host/depth setup
+    // before interpreting provider diagnostics.
     else
     {
         outputColor = source.rgb;
     }
 
+    // Diagnostics are normalized presentation signals. Preserve source alpha.
     return float4(saturate(outputColor), source.a);
 }
 
+// A single pass is enough because the parity builder owns both provider calls
+// for the current pixel and returns the complete comparison record directly.
 technique CAMERA_OBSCURA_API_TwinLanternParityExample
 <
     ui_label = "Camera Obscura API - Twin Lantern Parity";

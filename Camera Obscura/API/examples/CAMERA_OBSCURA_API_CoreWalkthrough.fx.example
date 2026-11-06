@@ -1,10 +1,41 @@
 // SPDX-FileCopyrightText: 2026 dastardlyrat and OpenSurface contributors
 // SPDX-License-Identifier: MIT
-// Generated example consumer; copy to reshade-shaders/Shaders and remove .example.
+//
+// CAMERA OBSCURA CORE WALKTHROUGH
+// --------------------------------
+// This is a generated teaching consumer for the seven-file core umbrella.
+// It is intentionally stored as .fx.example so installing the API does not
+// silently add a loadable ReShade technique.
+//
+// To test it, copy this file into reshade-shaders/Shaders and remove only the
+// final .example suffix. The target installation must provide ReShade.fxh and
+// a correctly configured depth buffer.
+//
+// DATAFLOW
+//   back buffer + linearized depth
+//     -> context and receiver surface evidence
+//     -> one bounded ray request
+//     -> independent DDA and March provider results
+//     -> dual-provider agreement and per-provider contributions
+//     -> evidence-weighted resolve
+//     -> bounded composite or a diagnostic projection
+//
+// IMPORTANT BOUNDARIES
+//   * A valid surface is evidence, not permission to add light.
+//   * A provider hit is evidence, not a selected final answer.
+//   * Resolve combines admitted contributions; it does not create evidence.
+//   * Debug views expose state but do not change production authority.
+//   * Static package checks do not prove a live ReShade compile or good depth.
 
+// ReShade owns the back-buffer/depth accessors and full-screen vertex shader.
 #include "ReShade.fxh"
+
+// The umbrella pulls in Common, Services, Providers, Cohesion, Debug, and
+// Transmigration. This example consumes only the documented core wrappers.
 #include "camera_obscura/api/CAMERA_OBSCURA_API_All.fxh"
 
+// This switch controls application strength only. Evidence is still built so
+// the diagnostic views remain useful while the visible composite is disabled.
 uniform bool CAMERA_OBSCURA_EX_CoreEnabled
 <
     ui_type = "checkbox";
@@ -12,6 +43,8 @@ uniform bool CAMERA_OBSCURA_EX_CoreEnabled
     ui_label = "Enable Core Composite";
 > = true;
 
+// The core composite saturates this value internally. Keeping the public range
+// at 0..1 makes the example's intent explicit and avoids misleading headroom.
 uniform float CAMERA_OBSCURA_EX_CoreStrength
 <
     ui_type = "slider";
@@ -22,6 +55,8 @@ uniform float CAMERA_OBSCURA_EX_CoreStrength
     ui_step = 0.01;
 > = 0.20;
 
+// The item order mirrors CAMERA_OBSCURA_DebugView. View zero is the production
+// composite; the remaining entries are evidence projections or source.
 uniform int CAMERA_OBSCURA_EX_CoreView
 <
     ui_type = "combo";
@@ -30,63 +65,118 @@ uniform int CAMERA_OBSCURA_EX_CoreView
     ui_items = "Composite\0DDA Hit\0March Hit\0Agreement\0DDA Contribution\0March Contribution\0Reasons\0Composite Delta\0Provider Balance\0Source\0";
 > = 0;
 
+// Frame count is used only as a deterministic spatial phase for direction and
+// March sampling variation. The core API shown here owns no temporal history.
 uniform float CAMERA_OBSCURA_EX_FrameCount
 < source = "framecount"; >;
 
+// ReShade invokes this once per output pixel. SV_Position supplies pixel-space
+// coordinates; TEXCOORD supplies normalized screen UV.
 float4 CAMERA_OBSCURA_API_CoreWalkthrough_PS(
     float4 position : SV_Position,
     float2 uv : TEXCOORD) : SV_Target
 {
+    // Preserve the unmodified source and its alpha for bypass and diagnostics.
     float4 source = tex2D(ReShade::BackBuffer, uv);
+
+    // Capability query is the first fail-closed boundary. The current C0
+    // implementation reports the color and linearized-depth facilities used
+    // below; the consumer still must verify the game's actual depth setup.
     CAMERA_OBSCURA_Capabilities capabilities =
         CAMERA_OBSCURA_API_QueryCapabilities();
 
+    // Never attempt provider work when the declared inputs are unavailable.
+    // Returning the original sample is the recovery path for this example.
     if (capabilities.has_color < 0.5 || capabilities.has_depth < 0.5)
     {
         return source;
     }
 
+    // Context carries the clamped receiver UV, pixel coordinate, deterministic
+    // phase, and the semantic stage being demonstrated. It carries no color or
+    // depth authority by itself.
     CAMERA_OBSCURA_API_Context context = CAMERA_OBSCURA_API_MakeContext(
         uv,
         position.xy,
         CAMERA_OBSCURA_EX_FrameCount,
         CAMERA_OBSCURA_API_STAGE_COHESION);
+
+    // BuildSurface samples linearized depth around the receiver and derives a
+    // proxy normal, depth confidence, edge risk, and source luma. Invalid depth
+    // produces an invalid guide rather than guessed geometry.
     CAMERA_OBSCURA_SurfaceGuide surface =
         CAMERA_OBSCURA_API_BuildSurface(context);
+
+    // C0 direction selection rotates among eight screen-space directions using
+    // pixel position and spatial phase. It is deterministic for the inputs.
     float2 direction = CAMERA_OBSCURA_API_SelectDirection(context);
+
+    // DefaultRequest turns the direction into an explicit bounded request with
+    // ray length, depth slope, bias, thickness, confidence, and step controls.
     CAMERA_OBSCURA_RayRequest request =
         CAMERA_OBSCURA_API_DefaultRequest(direction);
 
+    // Carry the same phase into the trace controls used by both providers.
+    // Sharing request and controls makes provider comparison meaningful.
     request.spatial_phase = context.spatial_phase;
 
+    // BuildControls clamps and normalizes caller-facing request values before
+    // traversal. This is control preparation, not a provider result.
     CAMERA_OBSCURA_TraceControls controls =
         CAMERA_OBSCURA_API_BuildControls(request);
+
+    // BuildRay binds the receiver evidence and normalized controls into one ray
+    // record. A missing receiver or zero direction leaves ray.valid at zero.
     CAMERA_OBSCURA_Ray ray = CAMERA_OBSCURA_API_BuildRay(
         context,
         surface,
         request,
         controls);
+
+    // Run independent traversal providers over the exact same ray and controls.
+    // Each wrapper also refines a coarse hit before returning it.
     CAMERA_OBSCURA_Hit dda = CAMERA_OBSCURA_API_TraceDDA(ray, controls);
     CAMERA_OBSCURA_Hit march = CAMERA_OBSCURA_API_TraceMarch(ray, controls);
+
+    // Cohesion compares provider presence, confidence, UV, depth, and distance.
+    // It records agreement/conflict; it does not secretly choose one provider.
     CAMERA_OBSCURA_DualHit dual =
         CAMERA_OBSCURA_API_EvaluateDualHit(dda, march);
+
+    // Turn each hit into its own donor contribution. Invalid hits remain zero-
+    // weight records, so absence is not confused with supported black light.
     CAMERA_OBSCURA_Contribution ddaContribution =
         CAMERA_OBSCURA_API_BuildContribution(context, surface, dda);
     CAMERA_OBSCURA_Contribution marchContribution =
         CAMERA_OBSCURA_API_BuildContribution(context, surface, march);
+
+    // Fallback preserves the receiver's source color and records receiver
+    // confidence. It is the source-bearing recovery record for the resolve.
     CAMERA_OBSCURA_Fallback fallback =
         CAMERA_OBSCURA_API_DefaultFallback(context, surface);
+
+    // Resolve performs evidence-weighted combination of the two independent
+    // contributions. RGB is indirect candidate color; alpha is confidence.
     float4 resolved = CAMERA_OBSCURA_API_Resolve(
         dual,
         ddaContribution,
         marchContribution,
         fallback);
+
+    // Disabling application sets strength to zero but leaves the evidence path
+    // intact for inspection. This distinction is why debug remains available.
     float strength = CAMERA_OBSCURA_EX_CoreEnabled ?
         CAMERA_OBSCURA_EX_CoreStrength : 0.0;
+
+    // Composite adds only the resolved indirect candidate admitted by resolved
+    // confidence and strength, then clamps normalized output channels.
     float3 composite = CAMERA_OBSCURA_API_Composite(
         fallback,
         resolved,
         strength);
+
+    // DebugView is the final presentation switch. It receives all records and
+    // returns either the composite, source, or an evidence visualization.
     float3 outputColor = CAMERA_OBSCURA_API_DebugView(
         (float)CAMERA_OBSCURA_EX_CoreView,
         source.rgb,
@@ -97,9 +187,13 @@ float4 CAMERA_OBSCURA_API_CoreWalkthrough_PS(
         ddaContribution,
         marchContribution);
 
+    // Diagnostic signals are display colors, so clamp them for presentation.
+    // Preserve source alpha; this example does not assign new alpha semantics.
     return float4(saturate(outputColor), source.a);
 }
 
+// One pass is sufficient because this example builds and consumes all records
+// for the current pixel without allocating history or intermediate textures.
 technique CAMERA_OBSCURA_API_CoreWalkthrough
 <
     ui_label = "Camera Obscura API - Core Walkthrough";
