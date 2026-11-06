@@ -43,7 +43,7 @@ API/header files · 6 ReShade techniques**.
 
 | Project | Reach for it when… | What it is not | Published boundary |
 |---|---|---|---|
-| **[Camera Obscura API](Camera%20Obscura/API/)** | A consuming ReShade effect needs explicit surface, provider, cohesion, debug, or evidence contracts | A standalone effect, technique, or declaration that every hosted symbol is stable | Install-ready include library with 29 API headers, nine support headers, 9/9 package checks, and a seven-file core umbrella |
+| **[Camera Obscura API](Camera%20Obscura/API/)** | A consuming ReShade effect needs explicit surface, provider, cohesion, debug, or evidence contracts | A standalone effect, technique, or declaration that every hosted symbol is stable | Install-ready include library with 29 API headers, nine support headers, three dormant examples, 10/10 package checks, and a seven-file core umbrella |
 | **[External Image Denoiser](Camera%20Obscura/External%20Image%20Denoiser/)** | Fine-detail shimmer, temporal instability, or spatial noise remains in the completed image | GI, ray tracing, donor transport, or lighting reconstruction | Install-ready `reshade-shaders` tree; accepted V2.1 package recorded 30/30 focused checks and confirmed live application/order |
 | **[Guided Detail](Camera%20Obscura/Guided%20Detail/)** | Stable texture or contours need deliberate recovery or coherent line emphasis | A blind universal sharpener or automatic art-style filter | Accepted public staging source with documented compile and visual-test procedure |
 | **[Stabilized Detail Cache](Camera%20Obscura/Stabilized%20Detail%20Cache/)** | Selected detail should survive later color or image effects and return near the end | Temporal accumulation or storage across frames, loading screens, or sessions | 19/19 source-package checks plus a user-reported clean compile and visual pass |
@@ -164,12 +164,13 @@ and removed together.
 ### Include-only API library
 
 **Camera Obscura API** ships an install-ready `reshade-shaders` directory but no
-effect or technique. Merge that directory into the game's existing
+loadable effect or technique. Merge that directory into the game's existing
 `reshade-shaders` tree, then include
 `camera_obscura/api/CAMERA_OBSCURA_API_All.fxh` from a consuming effect. Preserve
 the adjacent `api` and `header` directories. See the
 [API landing page](Camera%20Obscura/API/) before adopting headers outside the
-seven-file core umbrella.
+seven-file core umbrella. Three `.fx.example` consumers are available for
+deliberate copy-and-rename testing; they are not loaded by installation alone.
 
 ## Evidence, Not Magic
 

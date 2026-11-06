@@ -45,11 +45,12 @@ It is designed to keep the important boundaries legible:
 | Verify source authority, hashes, and umbrella classification | **[Source inventory](docs/SOURCE_INVENTORY.csv)** |
 | Audit the source-to-publication transformation | **[Publication transform](docs/PUBLICATION_TRANSFORM.md)** |
 | See exactly what was tested—and what was not | **[Validation record](docs/VALIDATION.md)** |
+| Start from deliberate, inspectable consumers | **[Dormant examples](examples/README.md)** |
 
 ## Install The Include Library
 
-This project ships an install-ready `reshade-shaders` tree but no standalone
-effect or ReShade technique.
+This project ships an install-ready `reshade-shaders` tree with no loadable
+effect or ReShade technique. Dormant examples remain outside that tree.
 
 1. Merge this project's `reshade-shaders` directory into the game's existing
    `reshade-shaders` directory.
@@ -66,6 +67,25 @@ effect or ReShade technique.
 
 The package contains 29 API headers and nine adjacent support headers. Their
 relative layout must be preserved.
+
+## Examples
+
+Three generated consumers demonstrate distinct adoption boundaries without
+turning the include library into an automatically loaded effect package:
+
+| Example | What it demonstrates | Default safety |
+|---|---|---|
+| [Core walkthrough](examples/CAMERA_OBSCURA_API_CoreWalkthrough.fx.example) | Context → surface → shared ray → DDA and March → cohesion → bounded composite → debug dispatch | Low default composite strength; ten inspectable views |
+| [Twin Lantern parity](examples/CAMERA_OBSCURA_API_TwinLanternParity.fx.example) | Both providers receiving the same specialized Twin Lantern ray and controls through an OpenSurface development extension | Diagnostic-only; never composites transport |
+| [Twin Lantern bounded composite](examples/CAMERA_OBSCURA_API_TwinLanternComposite.fx.example) | Public [Twin Lanterns API 0.1.0](https://github.com/alia-june/Lunar-Flower/tree/main/Twin-Lanterns/API/0.1.0) transport feeding the TL09 admission and containment contract | Composite disabled and source-exact by default |
+
+The `.fx.example` suffix is intentional. Follow the
+[example installation procedure](examples/README.md) to copy and rename only
+the consumer you want to test. The Twin Lantern examples explicitly adopt
+specialized source-present headers outside the seven-file core umbrella; they
+do not promote those headers into the core. The bounded-composite example stays
+within registered Twin Lanterns 0.1.0 entrypoints; the parity inspector is
+explicitly an OpenSurface extension outside that twelve-symbol contract.
 
 ## Core Architecture
 
@@ -226,7 +246,8 @@ The hand-written landing page and core reference are not overwritten.
 
 ## Current Validation
 
-The bounded documentation checks pass for the current source snapshot:
+The bounded package validator passes **10/10** checks for the current source
+snapshot:
 
 - 29/29 API headers readable;
 - 41/41 quoted includes resolve locally;
@@ -236,6 +257,8 @@ The bounded documentation checks pass for the current source snapshot:
 - zero indexed declaration tokens are absent from the generated reference;
 - all local documentation links resolve;
 - no private machine path appears in the documentation artifacts.
+- three dormant examples have their expected technique, MIT metadata, and
+  locally resolvable installed include target.
 
 See [docs/VALIDATION.md](docs/VALIDATION.md) for the diagnostic redux that corrected the
 initial extractor and for the exact proof boundary.

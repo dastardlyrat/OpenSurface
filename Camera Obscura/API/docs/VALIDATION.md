@@ -15,6 +15,8 @@ Status: **PASS for the bounded source, package, and documentation checks below**
   tree
 - publication copies add only the repository's MIT copyright and SPDX license
   header before their prior implementation bytes
+- three generated consumers are stored outside the install tree with dormant
+  `.fx.example` suffixes
 - accepted frozen runtime source was not modified or silently relabeled
 
 ## Executed checks
@@ -30,6 +32,7 @@ Status: **PASS for the bounded source, package, and documentation checks below**
 | Function inventory | PASS | independent scan and index both report 120 function definitions |
 | Declaration rendering | PASS | zero indexed macro, struct, scoped-field, or function signatures missing from `DECLARATIONS.md` |
 | Core umbrella derivation | PASS | seven files reachable from `CAMERA_OBSCURA_API_All.fxh`; 22 API headers remain outside that umbrella |
+| Dormant examples | PASS | three expected consumers, three expected techniques, required contract-call tokens present, 6/6 includes classified, and 3/3 local API include targets resolve in the simulated installed layout |
 | Publication metadata | PASS | 38/38 hosted shader headers carry MIT SPDX metadata |
 | Documentation links | PASS | all local API-package documentation links resolve |
 | Private-path scan | PASS | no private machine path is present in the hosted API package |
@@ -51,14 +54,16 @@ explicitly and confirmed the resulting 29 API plus nine support headers.
 
 These checks establish that the hosted declaration documentation is
 byte-current with the published API headers, all package-local includes resolve,
-the expected declarations are covered, and the public copies carry the stated
-license metadata.
+the expected declarations are covered, the public copies carry the stated
+license metadata, and the dormant examples name source-present techniques and
+installed include targets consistently.
 
 They do not establish:
 
 - complete semantic documentation of all 29 API headers;
 - stable public-API status for source-present declarations;
 - shader or consuming-effect compilation;
+- example compilation or execution;
 - ReShade host or game compatibility;
 - runtime behavior, target-game depth correctness, performance, or visual
   acceptance;
