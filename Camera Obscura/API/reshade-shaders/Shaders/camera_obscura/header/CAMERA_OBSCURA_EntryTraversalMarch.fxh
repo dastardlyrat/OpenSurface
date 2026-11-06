@@ -1,0 +1,11 @@
+// SPDX-FileCopyrightText: 2026 dastardlyrat and OpenSurface contributors
+// SPDX-License-Identifier: MIT
+
+#ifndef CAMERA_OBSCURA_ENTRY_TRAVERSAL_MARCH_FXH
+#define CAMERA_OBSCURA_ENTRY_TRAVERSAL_MARCH_FXH
+
+#define CAMERA_OBSCURA_TRAVERSAL_MARCH_ONLY 1
+#include "CAMERA_OBSCURA_EntryTraversal.fxh"
+#undef CAMERA_OBSCURA_TRAVERSAL_MARCH_ONLY
+
+#endif // CAMERA_OBSCURA_ENTRY_TRAVERSAL_MARCH_FXH

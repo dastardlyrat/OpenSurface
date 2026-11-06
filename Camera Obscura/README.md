@@ -11,10 +11,11 @@ exact bypass behavior are exposed wherever the implementation can expose them.
 The effects can form a workflow, but they are not a mandatory monolithic
 pipeline. Start with the one that solves the problem you can actually see.
 
-## Choose An Effect
+## Choose A Project
 
 | Project | Use it when | Avoid treating it as | Publication evidence |
 |---|---|---|---|
+| [Camera Obscura API](API/) | A consuming effect needs explicit surface, provider, cohesion, debug, or evidence contracts | A standalone effect or a promise that every source-present symbol is stable | 29 API and nine support headers; 9/9 package checks; seven-file core umbrella documented |
 | [Guided Detail](Guided%20Detail/) | Stable texture or contours need deliberate recovery or line emphasis | A universal sharpener or automatic art-style filter | Accepted staging source with compile and visual test procedure |
 | [External Image Denoiser](External%20Image%20Denoiser/) | Fine-detail shimmer, temporal instability, or spatial noise remains in the completed image | GI, ray tracing, donor transport, or lighting reconstruction | 30/30 package checks; live application and order confirmed |
 | [Stabilized Detail Cache](Stabilized%20Detail%20Cache/) | Chosen detail should survive later color or image effects and return at the end | Long-term temporal storage or dynamic VRAM management | 19/19 package checks; live compile and visual pass reported |
@@ -71,7 +72,7 @@ contribution as well.
 
 ## Installation Models
 
-The projects currently use two layouts.
+The projects currently use three cases.
 
 **Install-ready tree:** External Image Denoiser contains a
 `reshade-shaders` folder. Merge that folder into the game's existing
@@ -82,6 +83,12 @@ Revival retain project-local `effects`, `header`, or `api` folders. Copy each
 unit without flattening its sibling directories, then add the effect directory
 to ReShade's effect search paths and the supporting directory to its shader
 search paths as described by that project's README.
+
+**Include-only library:** Camera Obscura API contains an install-ready
+`reshade-shaders` tree but no effect or technique. Merge the tree into the
+game's existing `reshade-shaders` directory, then include its core or adopted
+specialized headers from a consuming effect. Preserve the adjacent
+`camera_obscura/api` and `camera_obscura/header` directories.
 
 All effects depend on the installation's `ReShade.fxh`. OpenSurface does not
 bundle or replace that framework header.
@@ -133,6 +140,10 @@ Current evidence and unresolved gates are recorded in
 Disable the technique or remove only that project's installed files. The
 projects do not require a shared Camera Obscura runtime. For Stabilized Detail
 Cache, disable or remove Capture and Reapply together.
+
+The API has no technique to disable. Remove only its hosted `camera_obscura/api`
+and `camera_obscura/header` files after confirming that no installed effect
+still includes them.
 
 ## License
 

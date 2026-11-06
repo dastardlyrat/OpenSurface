@@ -1,10 +1,10 @@
 # Validation Record
 
-## Current-tree relocation — 2026-11-05
+## Current-tree validation — 2026-11-06
 
-The xOSG family now lives in [alia-june/xOSG-prototype](https://github.com/alia-june/xOSG-prototype/tree/main/docs/xosg). The source cleanup removes its current working tree only after destination verification. The records below describe their dated earlier source states; their counts do not describe the remaining OpenSurface file inventory. The migration validation summary records fresh fixed DWSK checks. Camera Obscura source and its live runtime gates are unchanged.
+The xOSG family now lives in [alia-june/xOSG-prototype](https://github.com/alia-june/xOSG-prototype/tree/main/docs/xosg). The source cleanup removes its current working tree only after destination verification. The records below describe their dated earlier source states; their counts do not describe the remaining OpenSurface file inventory. The migration validation summary records fresh fixed DWSK checks. This update also hosts the Camera Obscura development API as an include-only package; it does not change the existing effects or close their live runtime gates.
 
-Date: 2026-11-01
+Date: 2026-11-06
 
 Truth state: local structural, integrity, compatibility-compiler, and strict
 helper-compiler evidence. This is not a live ReShade runtime attestation.
@@ -13,13 +13,17 @@ helper-compiler evidence. This is not a live ReShade runtime attestation.
 
 `python -B tools/validate_repository.py`
 
-Result: 19/19 pass.
+Result: 20/20 pass.
 
 The checks cover:
 
 - five expected effect files and six expected techniques;
-- the README's four-unit, five-effect, six-support-file, and six-technique
+- the README's five-unit, five-effect, 44-support/API-file, and six-technique
   inventory against the current tree;
+- the hosted Camera Obscura API package's 29 API headers, nine adjacent support
+  headers, exact source-origin parity after removing only the declared SPDX
+  prefix, local include closure, generated documentation currency, declaration
+  inventory, public-path boundary, and required publication artifacts;
 - the separate Revival-package boundary for the Stabilized Color and Luma
   caches, including their public source links and nonlocal status;
 - a clean public file boundary with an independently installable denoiser
@@ -30,7 +34,7 @@ The checks cover:
 - exactly two Lazara-owned headers;
 - balanced source blocks;
 - four exact source revisions in the provenance ledger;
-- source-manifest integrity;
+- source-manifest integrity across all 49 `.fx` and `.fxh` files;
 - sanitized Synthetic Simulations failure-record identity and exclusion state;
 - local README image and document-link resolution.
 
@@ -47,8 +51,8 @@ Specification: REUSE 3.3
 
 Result: compliant.
 
-- covered files with copyright information: 68/68;
-- covered files with licensing information: 68/68;
+- covered files with copyright information: 78/78;
+- covered files with licensing information: 78/78;
 - bad, deprecated, missing, unused, or malformed licenses: zero;
 - used licenses: `MIT` and `LicenseRef-Documentation-Screenshot`.
 
