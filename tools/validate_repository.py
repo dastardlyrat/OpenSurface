@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import hashlib
 import re
+import subprocess
 import sys
 from pathlib import Path
 from urllib.parse import unquote
@@ -324,6 +325,7 @@ def main() -> int:
         tuple(int(value) for value in surface_match.groups()) if surface_match else None
     )
     unit_links = (
+        "Camera%20Obscura/API/",
         "Camera%20Obscura/External%20Image%20Denoiser/",
         "Camera%20Obscura/Guided%20Detail/",
         "Camera%20Obscura/Stabilized%20Detail%20Cache/",
@@ -336,9 +338,31 @@ def main() -> int:
     checks.append(report(
         "readme_current_surface",
         surface_current,
-        f"documented={documented_surface}; actual={current_surface}; unit links=4/4"
+        f"documented={documented_surface}; actual={current_surface}; unit links={len(unit_links)}/{len(unit_links)}"
         if surface_current
         else f"documented={documented_surface}; actual={current_surface}",
+    ))
+
+    api_validator = ROOT / "Camera Obscura" / "API" / "tools" / "validate_package.py"
+    api_validation = subprocess.run(
+        [sys.executable, "-B", str(api_validator)],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        check=False,
+    ) if api_validator.is_file() else None
+    api_summary = (
+        next(
+            (line for line in reversed(api_validation.stdout.splitlines()) if line.startswith("SUMMARY|")),
+            "package validator returned no summary",
+        )
+        if api_validation is not None
+        else "package validator missing"
+    )
+    checks.append(report(
+        "camera_obscura_api_package",
+        api_validation is not None and api_validation.returncode == 0,
+        api_summary,
     ))
 
     revival_root = "https://github.com/dastardlyrat/Lazara-Reshade-Revival-Package"

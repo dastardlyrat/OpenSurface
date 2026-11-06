@@ -16,6 +16,7 @@ path = [
   "SOURCE_MANIFEST.sha256",
   "THIRD_PARTY_NOTICES.md",
   "Camera Obscura/README.md",
+  "Camera Obscura/API/**",
   "Camera Obscura/External Image Denoiser/**",
   "Camera Obscura/Stabilized Detail Cache/**",
   "Camera Obscura/Lazara Color Revival/**",

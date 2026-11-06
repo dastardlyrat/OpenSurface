@@ -25,6 +25,9 @@ The storefront may contain:
 - bounded provenance and validation summaries;
 - reproducible public validators;
 - source and release integrity manifests.
+- explicitly labeled development API snapshots whose source, licensing,
+  include closure, lifecycle limits, and publication transformation are
+  reproducibly recorded.
 
 ## Private Workshop Material
 
@@ -58,6 +61,11 @@ Before a public release:
 7. Inspect documentation links and install instructions.
 8. Confirm that the public remote contains only the clean publication history.
 9. Record the release tag and package hashes.
+
+Hosting a development API snapshot does not by itself make every declaration a
+stable public contract, wire cold material into a runtime umbrella, or
+supersede a separately accepted frozen rail. Those transitions require their
+own explicit decision and validation evidence.
 
 ## Repository Model
 

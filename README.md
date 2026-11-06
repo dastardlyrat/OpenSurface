@@ -7,11 +7,11 @@
 **Recover detail. Stabilize the image. Revive supported color. Keep every correction inspectable.**
 
 [![ReShade FX](https://img.shields.io/badge/ReShade-FX-4b6b88?style=for-the-badge)](https://reshade.me/)
-[![Projects](https://img.shields.io/badge/projects-4-6f42c1?style=for-the-badge)](Camera%20Obscura/README.md)
-[![Validation](https://img.shields.io/badge/validation-19%2F19-2da44e?style=for-the-badge)](docs/VALIDATION.md)
+[![Projects](https://img.shields.io/badge/projects-5-6f42c1?style=for-the-badge)](Camera%20Obscura/README.md)
+[![Validation](https://img.shields.io/badge/validation-20%2F20-2da44e?style=for-the-badge)](docs/VALIDATION.md)
 [![License: MIT](https://img.shields.io/badge/license-MIT-0b7285?style=for-the-badge)](LICENSE)
 
-[Explore the effects](#choose-an-effect) · [Install](#installation) · [Build a pipeline](#a-practical-pipeline) · [Read the evidence](#evidence-not-magic)
+[Explore the projects](#choose-a-project) · [Install](#installation) · [Build a pipeline](#a-practical-pipeline) · [Read the evidence](#evidence-not-magic)
 
 </div>
 
@@ -32,17 +32,18 @@ source, installation guidance, licensing, provenance, integrity records, and
 bounded validation results while keeping private workshop material outside the
 public tree.
 
-Current shader surface: **4 project units · 5 `.fx` effect files · 6 `.fxh`
+Current shader surface: **5 project units · 5 `.fx` effect files · 44 `.fxh`
 API/header files · 6 ReShade techniques**.
 
 > Camera Obscura does not ask you to trust a mysterious final image. Its tools
 > expose the support, authority, rejection, and applied contribution that led
 > there.
 
-## Choose An Effect
+## Choose A Project
 
 | Project | Reach for it when… | What it is not | Published boundary |
 |---|---|---|---|
+| **[Camera Obscura API](Camera%20Obscura/API/)** | A consuming ReShade effect needs explicit surface, provider, cohesion, debug, or evidence contracts | A standalone effect, technique, or declaration that every hosted symbol is stable | Install-ready include library with 29 API headers, nine support headers, 9/9 package checks, and a seven-file core umbrella |
 | **[External Image Denoiser](Camera%20Obscura/External%20Image%20Denoiser/)** | Fine-detail shimmer, temporal instability, or spatial noise remains in the completed image | GI, ray tracing, donor transport, or lighting reconstruction | Install-ready `reshade-shaders` tree; accepted V2.1 package recorded 30/30 focused checks and confirmed live application/order |
 | **[Guided Detail](Camera%20Obscura/Guided%20Detail/)** | Stable texture or contours need deliberate recovery or coherent line emphasis | A blind universal sharpener or automatic art-style filter | Accepted public staging source with documented compile and visual-test procedure |
 | **[Stabilized Detail Cache](Camera%20Obscura/Stabilized%20Detail%20Cache/)** | Selected detail should survive later color or image effects and return near the end | Temporal accumulation or storage across frames, loading screens, or sessions | 19/19 source-package checks plus a user-reported clean compile and visual pass |
@@ -51,7 +52,17 @@ API/header files · 6 ReShade techniques**.
 Start with the [Camera Obscura family guide](Camera%20Obscura/README.md) for the
 shared method, diagnostic conventions, test discipline, and complete workflow.
 
-## Four Tools, One Inspectable Method
+## Four Image Tools And One Include Library
+
+### Camera Obscura API
+
+A hosted ReShade FX include library for explicit context, capability and surface
+services, separate refined DDA and March providers, inspectable cohesion,
+bounded composite wrappers, centralized diagnostics, and gated transmigration.
+Its 29 API headers and nine support headers are source and documentation
+surfaces—not a standalone visible effect. Only seven files belong to the core
+umbrella; the remaining headers retain their documented cold or source-present
+boundaries.
 
 ### External Image Denoiser
 
@@ -122,7 +133,8 @@ untouched.
 
 ## Installation
 
-OpenSurface currently uses two installation models.
+OpenSurface currently uses two shader installation models plus one include-only
+library layout.
 
 ### Install-ready tree
 
@@ -148,6 +160,16 @@ Keep the installation's known-good `ReShade.fxh`. OpenSurface does not bundle,
 download, or replace that framework header. Every unit is independently
 removable; Stabilized Detail Capture and Reapply should be installed, disabled,
 and removed together.
+
+### Include-only API library
+
+**Camera Obscura API** ships an install-ready `reshade-shaders` directory but no
+effect or technique. Merge that directory into the game's existing
+`reshade-shaders` tree, then include
+`camera_obscura/api/CAMERA_OBSCURA_API_All.fxh` from a consuming effect. Preserve
+the adjacent `api` and `header` directories. See the
+[API landing page](Camera%20Obscura/API/) before adopting headers outside the
+seven-file core umbrella.
 
 ## Evidence, Not Magic
 
@@ -182,12 +204,12 @@ For a new game or preset:
 
 ## What Is Actually Shipped
 
-The current tree contains exactly **eleven tracked shader sources**: five effects
-and six API/header files. It contains no preset, no ReShade binaries, and no
+The current tree contains exactly **49 tracked shader sources**: five effects
+and 44 API/header files. It contains no preset, no ReShade binaries, and no
 installation-provided `ReShade.fxh`.
 
 The root [source manifest](SOURCE_MANIFEST.sha256) records the exact bytes of all
-eleven shader sources. Project READMEs preserve their installation layouts,
+49 shader sources. Project READMEs preserve their installation layouts,
 technique names, validation evidence, known limitations, and recovery paths.
 
 ### Additional Camera Obscura effects in Lazara Revival
@@ -226,7 +248,7 @@ Run the repository validator from the root:
 python -B tools/validate_repository.py
 ```
 
-Current result: **19/19 passed**.
+Current result: **20/20 passed**.
 
 The validator checks the exact effect and technique sets, documented public
 surface, local include closure, external `ReShade.fxh` boundary, source hashes,

@@ -69,6 +69,35 @@ License continuation: the previously unlicensed project-owned Lazara source is
 expressly published under MIT on 2026-10-31 by owner direction. The source
 repository, commit, and original authorship remain recorded above.
 
+## Camera Obscura API
+
+- Publication authorization: user direction to host the API in OpenSurface
+  under `Camera Obscura` on 2026-11-06
+- Source basis: reviewed current Camera Obscura development tree; the source
+  workspace is not itself a Git checkout, so a source commit identity is
+  unavailable rather than inferred
+- Hosted surface: 29 API headers and nine adjacent support headers in an
+  install-ready `reshade-shaders` layout
+- Source identities: 38 pre-publication SHA-256 values retained in
+  `Camera Obscura/API/docs/SOURCE_ORIGIN.sha256`
+- Publication transform: the repository MIT copyright/SPDX prefix is prepended
+  to each hosted header; `tools/validate_package.py` strips that exact prefix
+  and confirms all remaining implementation bytes against the origin manifest
+- Documentation surface: core semantic reference, complete declaration index,
+  machine-readable symbol index, source inventory, validation record, and
+  reproducible documentation generator
+- Core boundary: seven files are reachable from
+  `CAMERA_OBSCURA_API_All.fxh`; 22 API headers are source-present outside that
+  umbrella and are not silently presented as wired or stable
+- License: hosted public copies follow the repository's MIT publication policy
+  and carry inline SPDX metadata
+- Fresh public-package evidence: 9/9 bounded package checks pass, including
+  38/38 origin implementation parity and 53/53 local include resolution
+- Unresolved evidence: no consuming-effect compile, ReShade runtime, target-game
+  depth, performance, visual acceptance, or stable-symbol compatibility claim
+- Canon boundary: hosting does not replace the accepted frozen runtime rail or
+  promote cold receptors
+
 ## Package-only Stabilized Color And Luma Caches
 
 - Distribution source:
