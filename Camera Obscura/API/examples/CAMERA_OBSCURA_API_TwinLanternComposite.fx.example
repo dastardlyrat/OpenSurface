@@ -1,10 +1,46 @@
 // SPDX-FileCopyrightText: 2026 dastardlyrat and OpenSurface contributors
 // SPDX-License-Identifier: MIT
-// Generated example consumer; copy to reshade-shaders/Shaders and remove .example.
+//
+// TWIN LANTERN TRANSPORT TO BOUNDED COMPOSITE
+// -------------------------------------------
+// This generated teaching consumer demonstrates two registered Twin Lanterns
+// API 0.1.0 entrypoints:
+//   * CAMERA_OBSCURA_API_BuildTwinLanternTransportEvidence
+//   * CAMERA_OBSCURA_API_BuildTL09Composite
+//
+// DATAFLOW
+//   source color + linearized depth
+//     -> one receiver ray
+//     -> independent DDA and March donor candidates
+//     -> normalized provider weights + combined donor RGB
+//     -> evidence-strength admission
+//     -> strength and maximum-contribution containment
+//     -> per-channel remaining-room containment
+//     -> final RGB or a diagnostic view
+//
+// WHY THE DEFAULT IS OFF
+//   Transport evidence is target- and depth-configuration-sensitive. The
+//   example should first prove its inputs and provider behavior. With View set
+//   to Final Composite and Enable Bounded Composite off, this shader returns
+//   the original source sample directly, before presentation clamping.
+//
+// NORMALIZED SDR BOUNDARY
+//   TL09 defines channel room as 1 minus source RGB. HDR or differently encoded
+//   consumers need an explicit adaptation; they must not silently reuse this
+//   normalized SDR ceiling.
+//
+// Copy this file into reshade-shaders/Shaders and remove the final .example
+// suffix only when you deliberately want the example technique.
 
+// ReShade supplies the source image, linearized depth, and vertex shader.
 #include "ReShade.fxh"
+
+// TwinLanternComposite is the 0.1.0 umbrella: Composite -> Reconstruction ->
+// Transport -> provider/common and traversal support.
 #include "camera_obscura/api/CAMERA_OBSCURA_API_TwinLanternComposite.fxh"
 
+// This is an application gate, not an evidence gate. Diagnostic views still
+// build transport evidence while the final composite remains source-exact.
 uniform bool CAMERA_OBSCURA_EX_TLCompositeEnabled
 <
     ui_type = "checkbox";
@@ -13,6 +49,8 @@ uniform bool CAMERA_OBSCURA_EX_TLCompositeEnabled
     ui_tooltip = "Off preserves the source exactly. Enable only after inspecting transport evidence and confirming depth behavior.";
 > = false;
 
+// Select one of the API's eight compass directions. Keeping the direction
+// explicit makes repeated captures and provider comparisons reproducible.
 uniform int CAMERA_OBSCURA_EX_TLCompositeDirection
 <
     ui_type = "slider";
@@ -22,6 +60,8 @@ uniform int CAMERA_OBSCURA_EX_TLCompositeDirection
     ui_max = 7;
 > = 0;
 
+// Final Composite is the only production-style view. The remaining entries are
+// direct record projections intended to explain admission and containment.
 uniform int CAMERA_OBSCURA_EX_TLCompositeView
 <
     ui_type = "combo";
@@ -30,6 +70,8 @@ uniform int CAMERA_OBSCURA_EX_TLCompositeView
     ui_items = "Final Composite\0Combined Donor\0Bounded Contribution\0Transport Evidence\0Admission And Application\0Provider Weights\0Source\0";
 > = 0;
 
+// Strength scales admitted indirect color. TL09 clamps negative values away;
+// this example exposes only the intended nonnegative 0..1 range.
 uniform float CAMERA_OBSCURA_EX_TLCompositeStrength
 <
     ui_type = "slider";
@@ -40,6 +82,8 @@ uniform float CAMERA_OBSCURA_EX_TLCompositeStrength
     ui_step = 0.01;
 > = 0.25;
 
+// Maximum Contribution is a per-channel upper bound before remaining source
+// channel room is applied. It is not a target brightness or exposure control.
 uniform float CAMERA_OBSCURA_EX_TLCompositeMaximum
 <
     ui_type = "slider";
@@ -50,49 +94,71 @@ uniform float CAMERA_OBSCURA_EX_TLCompositeMaximum
     ui_step = 0.005;
 > = 0.08;
 
+// Standard full-screen post-process entrypoint. Position remains in the
+// signature for consistency, while this API path uses normalized UV.
 float4 CAMERA_OBSCURA_API_TwinLanternCompositeExample_PS(
     float4 position : SV_Position,
     float2 uv : TEXCOORD) : SV_Target
 {
+    // Retain the exact source sample for the disabled recovery path and alpha.
     float4 source = tex2D(ReShade::BackBuffer, uv);
+
+    // Build complementary transport evidence. DDA and March trace independently
+    // and keep separate raw/normalized weights before their donor colors are
+    // combined. No usable provider weight yields zero contribution.
     CAMERA_OBSCURA_API_TwinLanternTransportEvidence transport =
         CAMERA_OBSCURA_API_BuildTwinLanternTransportEvidence(
-            uv,
-            (float)CAMERA_OBSCURA_EX_TLCompositeDirection,
-            CAMERA_OBSCURA_API_TL45_INPUT_LIVE,
-            CAMERA_OBSCURA_API_TL07_MODE_COMPLEMENTARY,
-            16.0,
-            0.15,
-            0.0005,
-            0.0035);
+            uv,                                              // receiver UV
+            (float)CAMERA_OBSCURA_EX_TLCompositeDirection,   // compass index
+            CAMERA_OBSCURA_API_TL45_INPUT_LIVE,              // use live depth
+            CAMERA_OBSCURA_API_TL07_MODE_COMPLEMENTARY,      // admit supported providers
+            16.0,                                            // bounded travel in pixels
+            0.15,                                            // ray depth slope
+            0.0005,                                          // front interval bias
+            0.0035);                                         // back interval thickness
+
+    // Feed un-preweighted combined_donor_rgb plus evidence_strength into TL09.
+    // Do not pass raw_radiance_rgb here: that field already includes transport
+    // evidence strength, and TL09 applies its evidence argument once. Passing
+    // raw radiance with the same evidence would unintentionally weight twice.
     CAMERA_OBSCURA_API_TL09CompositeEvidence composite =
         CAMERA_OBSCURA_API_BuildTL09Composite(
-            source.rgb,
-            transport.combined_donor_rgb,
-            transport.evidence_strength,
-            transport.receiver_valid,
-            CAMERA_OBSCURA_EX_TLCompositeEnabled ? 1.0 : 0.0,
-            CAMERA_OBSCURA_EX_TLCompositeStrength,
-            CAMERA_OBSCURA_EX_TLCompositeMaximum);
+            source.rgb,                                      // normalized source RGB
+            transport.combined_donor_rgb,                    // provider-normalized donor
+            transport.evidence_strength,                     // transport authority, 0..1
+            transport.receiver_valid,                        // receiver admission gate
+            CAMERA_OBSCURA_EX_TLCompositeEnabled ? 1.0 : 0.0,// explicit application gate
+            CAMERA_OBSCURA_EX_TLCompositeStrength,           // caller-controlled scale
+            CAMERA_OBSCURA_EX_TLCompositeMaximum);           // per-channel addition ceiling
     float3 outputColor;
 
+    // Production-style result. TL09 retains its full admission, application,
+    // rejection, containment, and bounds evidence in the composite record.
     if (CAMERA_OBSCURA_EX_TLCompositeView == 0)
     {
         outputColor = composite.final_rgb;
     }
+    // Show the provider-normalized donor color before transport evidence,
+    // strength, maximum contribution, or channel room constrain it.
     else if (CAMERA_OBSCURA_EX_TLCompositeView == 1)
     {
         outputColor = transport.combined_donor_rgb;
     }
+    // Show the actual admitted addition, amplified eight times for visibility.
+    // This gain is display-only and never feeds back into the composite.
     else if (CAMERA_OBSCURA_EX_TLCompositeView == 2)
     {
         outputColor = saturate(composite.bounded_contribution_rgb * 8.0);
     }
+    // Heat-map the transport evidence strength before TL09 application gates.
     else if (CAMERA_OBSCURA_EX_TLCompositeView == 3)
     {
         outputColor = CAMERA_OBSCURA_DebugHeat(
             transport.evidence_strength);
     }
+    // Contract-state channels:
+    //   red = admitted, green = contribution actually applied,
+    //   blue = rejected or unable to apply.
     else if (CAMERA_OBSCURA_EX_TLCompositeView == 4)
     {
         outputColor = float3(
@@ -100,6 +166,9 @@ float4 CAMERA_OBSCURA_API_TwinLanternCompositeExample_PS(
             composite.application,
             composite.rejection);
     }
+    // Provider channels:
+    //   red = normalized DDA weight, green = normalized March weight,
+    //   blue = one-provider evidence stayed within its required bound.
     else if (CAMERA_OBSCURA_EX_TLCompositeView == 5)
     {
         outputColor = float3(
@@ -107,20 +176,28 @@ float4 CAMERA_OBSCURA_API_TwinLanternCompositeExample_PS(
             transport.march_normalized_weight,
             transport.one_provider_bound_ok);
     }
+    // Source is the control view and the first place to diagnose host problems.
     else
     {
         outputColor = source.rgb;
     }
 
+    // Exact disabled recovery for the default final view. This occurs after
+    // evidence construction so other views remain inspectable while disabled,
+    // but before saturating presentation output so the source sample is exact.
     if (!CAMERA_OBSCURA_EX_TLCompositeEnabled &&
         CAMERA_OBSCURA_EX_TLCompositeView == 0)
     {
         return source;
     }
 
+    // Active TL09 output and all diagnostics are normalized presentation data.
+    // Preserve the incoming alpha because this example defines no alpha output.
     return float4(saturate(outputColor), source.a);
 }
 
+// This intentionally omits reconstruction textures and temporal history. It is
+// a minimal transport-to-authority example, not a complete production effect.
 technique CAMERA_OBSCURA_API_TwinLanternCompositeExample
 <
     ui_label = "Camera Obscura API - Twin Lantern Bounded Composite";

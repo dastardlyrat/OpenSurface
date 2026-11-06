@@ -32,7 +32,7 @@ Status: **PASS for the bounded source, package, and documentation checks below**
 | Function inventory | PASS | independent scan and index both report 120 function definitions |
 | Declaration rendering | PASS | zero indexed macro, struct, scoped-field, or function signatures missing from `DECLARATIONS.md` |
 | Core umbrella derivation | PASS | seven files reachable from `CAMERA_OBSCURA_API_All.fxh`; 22 API headers remain outside that umbrella |
-| Dormant examples | PASS | three expected consumers, three expected techniques, required contract-call tokens present, 6/6 includes classified, and 3/3 local API include targets resolve in the simulated installed layout |
+| Dormant examples | PASS | three expected consumers, three expected techniques, required contract-call tokens present, balanced braces, 221 explanatory comment lines with every file above the minimum, six required integration-guide sections, 6/6 includes classified, and 3/3 local API include targets resolve in the simulated installed layout |
 | Publication metadata | PASS | 38/38 hosted shader headers carry MIT SPDX metadata |
 | Documentation links | PASS | all local API-package documentation links resolve |
 | Private-path scan | PASS | no private machine path is present in the hosted API package |

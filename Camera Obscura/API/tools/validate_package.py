@@ -44,6 +44,15 @@ EXPECTED_EXAMPLE_SYMBOLS = {
         "CAMERA_OBSCURA_API_BuildTL09Composite",
     },
 }
+EXPECTED_EXAMPLE_README_SECTIONS = {
+    "## Architecture At A Glance",
+    "## Deliberate Installation",
+    "## Recommended Inspection Order",
+    "## Failure And Recovery",
+    "## What Static Validation Covers",
+    "## Extending An Example Without Losing The Boundaries",
+}
+MINIMUM_EXAMPLE_COMMENT_LINES = 50
 PUBLICATION_PREFIX = (
     b"// SPDX-FileCopyrightText: 2026 dastardlyrat and OpenSurface contributors\n"
     + f"// {SPDX_LICENSE_MARKER} MIT\n\n".encode("ascii")
@@ -152,9 +161,11 @@ def validate_examples() -> tuple[bool, str]:
     technique_failures: list[str] = []
     symbol_failures: list[str] = []
     balance_failures: list[str] = []
+    comment_failures: list[str] = []
     license_failures: list[str] = []
     includes = 0
     external_includes = 0
+    comment_lines = 0
 
     for path in files:
         source = path.read_text(encoding="utf-8")
@@ -169,6 +180,13 @@ def validate_examples() -> tuple[bool, str]:
             symbol_failures.append(path.name)
         if source.count("{") != source.count("}"):
             balance_failures.append(path.name)
+        file_comment_lines = sum(
+            1 for line in source.splitlines()
+            if line.lstrip().startswith("//")
+        )
+        comment_lines += file_comment_lines
+        if file_comment_lines < MINIMUM_EXAMPLE_COMMENT_LINES:
+            comment_failures.append(path.name)
         if f"{SPDX_LICENSE_MARKER} MIT" not in source:
             license_failures.append(path.name)
         for include in include_pattern.findall(source):
@@ -180,6 +198,17 @@ def validate_examples() -> tuple[bool, str]:
             if not installed_target.is_file():
                 missing_includes.append(f"{path.name} -> {include}")
 
+    readme_path = EXAMPLE_ROOT / "README.md"
+    readme_source = (
+        readme_path.read_text(encoding="utf-8")
+        if readme_path.is_file()
+        else ""
+    )
+    missing_readme_sections = {
+        section for section in EXPECTED_EXAMPLE_README_SECTIONS
+        if section not in readme_source
+    }
+
     passed = not any((
         missing_files,
         extra_files,
@@ -187,7 +216,9 @@ def validate_examples() -> tuple[bool, str]:
         technique_failures,
         symbol_failures,
         balance_failures,
+        comment_failures,
         license_failures,
+        missing_readme_sections,
     ))
     return (
         passed,
@@ -196,7 +227,9 @@ def validate_examples() -> tuple[bool, str]:
         f"technique_failures={len(technique_failures)}; "
         f"symbol_failures={len(symbol_failures)}; "
         f"balance_failures={len(balance_failures)}; "
-        f"license_failures={len(license_failures)}",
+        f"comments={comment_lines}; comment_failures={len(comment_failures)}; "
+        f"license_failures={len(license_failures)}; "
+        f"readme_section_failures={len(missing_readme_sections)}",
     )
 
 

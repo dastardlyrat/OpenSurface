@@ -70,8 +70,11 @@ relative layout must be preserved.
 
 ## Examples
 
-Three generated consumers demonstrate distinct adoption boundaries without
-turning the include library into an automatically loaded effect package:
+Three heavily annotated generated consumers demonstrate distinct adoption
+boundaries without turning the include library into an automatically loaded
+effect package. Their [integration guide](examples/README.md) documents the
+architecture, stage ownership, view channels, test order, failure recovery,
+and proof boundary:
 
 | Example | What it demonstrates | Default safety |
 |---|---|---|
@@ -258,7 +261,10 @@ snapshot:
 - all local documentation links resolve;
 - no private machine path appears in the documentation artifacts.
 - three dormant examples have their expected technique, MIT metadata, and
-  locally resolvable installed include target.
+  locally resolvable installed include target;
+- the examples retain 221 explanatory comment lines, balanced blocks, required
+  contract-call tokens, and the integration guide's required architecture,
+  inspection, recovery, validation, and extension sections.
 
 See [docs/VALIDATION.md](docs/VALIDATION.md) for the diagnostic redux that corrected the
 initial extractor and for the exact proof boundary.
