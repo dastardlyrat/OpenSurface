@@ -1,0 +1,122 @@
+// SPDX-FileCopyrightText: 2026 dastardlyrat and OpenSurface contributors
+// SPDX-License-Identifier: MIT
+// Generated example consumer; copy to reshade-shaders/Shaders and remove .example.
+
+#include "ReShade.fxh"
+#include "camera_obscura/api/CAMERA_OBSCURA_API_TwinLanternParity.fxh"
+
+uniform int CAMERA_OBSCURA_EX_TLParityDirection
+<
+    ui_type = "slider";
+    ui_category = "Camera Obscura API Examples / Twin Lantern Parity";
+    ui_label = "Direction Index";
+    ui_min = 0;
+    ui_max = 7;
+> = 0;
+
+uniform int CAMERA_OBSCURA_EX_TLParityInput
+<
+    ui_type = "combo";
+    ui_category = "Camera Obscura API Examples / Twin Lantern Parity";
+    ui_label = "Input Case";
+    ui_items = "Live Depth\0Forced Invalid Receiver\0Forced Zero Direction\0";
+> = 0;
+
+uniform int CAMERA_OBSCURA_EX_TLParityView
+<
+    ui_type = "combo";
+    ui_category = "Camera Obscura API Examples / Twin Lantern Parity";
+    ui_label = "Evidence View";
+    ui_items = "Provider Outcome\0Agreement Channels\0Conflict\0Confidence\0Endpoint\0Source\0";
+> = 0;
+
+uniform float CAMERA_OBSCURA_EX_TLParityRayPixels
+<
+    ui_type = "slider";
+    ui_category = "Camera Obscura API Examples / Twin Lantern Parity";
+    ui_label = "Ray Length Pixels";
+    ui_min = 1.0;
+    ui_max = 24.0;
+    ui_step = 1.0;
+> = 16.0;
+
+float3 CAMERA_OBSCURA_EX_TLParityOutcome(
+    CAMERA_OBSCURA_API_TwinLanternParityEvidence evidence)
+{
+    return saturate(
+        float3(0.10, 0.82, 0.30) * evidence.both_hit +
+        float3(0.12, 0.48, 1.00) * evidence.dda_only +
+        float3(1.00, 0.38, 0.10) * evidence.march_only +
+        float3(0.16, 0.16, 0.20) * evidence.neither_hit);
+}
+
+float4 CAMERA_OBSCURA_API_TwinLanternParityExample_PS(
+    float4 position : SV_Position,
+    float2 uv : TEXCOORD) : SV_Target
+{
+    float4 source = tex2D(ReShade::BackBuffer, uv);
+    CAMERA_OBSCURA_API_TwinLanternParityEvidence evidence =
+        CAMERA_OBSCURA_API_BuildTwinLanternParityEvidence(
+            uv,
+            (float)CAMERA_OBSCURA_EX_TLParityDirection,
+            (float)CAMERA_OBSCURA_EX_TLParityInput,
+            CAMERA_OBSCURA_EX_TLParityRayPixels,
+            0.15,
+            0.0005,
+            0.0035,
+            8.0,
+            0.015,
+            8.0);
+    float3 outputColor;
+
+    if (CAMERA_OBSCURA_EX_TLParityView == 0)
+    {
+        outputColor = CAMERA_OBSCURA_EX_TLParityOutcome(evidence);
+    }
+    else if (CAMERA_OBSCURA_EX_TLParityView == 1)
+    {
+        outputColor = float3(
+            evidence.uv_agreement,
+            evidence.depth_agreement,
+            evidence.distance_agreement);
+    }
+    else if (CAMERA_OBSCURA_EX_TLParityView == 2)
+    {
+        outputColor = lerp(
+            source.rgb * 0.18,
+            float3(1.0, 0.04, 0.02),
+            saturate(evidence.conflict));
+    }
+    else if (CAMERA_OBSCURA_EX_TLParityView == 3)
+    {
+        outputColor = float3(
+            evidence.dda_confidence,
+            evidence.march_confidence,
+            min(evidence.dda_confidence, evidence.march_confidence));
+    }
+    else if (CAMERA_OBSCURA_EX_TLParityView == 4)
+    {
+        outputColor = float3(
+            evidence.endpoint_uv_resolved,
+            evidence.ray_valid);
+    }
+    else
+    {
+        outputColor = source.rgb;
+    }
+
+    return float4(saturate(outputColor), source.a);
+}
+
+technique CAMERA_OBSCURA_API_TwinLanternParityExample
+<
+    ui_label = "Camera Obscura API - Twin Lantern Parity";
+    ui_tooltip = "Diagnostic-only comparison of DDA and March over the same Twin Lantern ray and controls.";
+>
+{
+    pass
+    {
+        VertexShader = PostProcessVS;
+        PixelShader = CAMERA_OBSCURA_API_TwinLanternParityExample_PS;
+    }
+}

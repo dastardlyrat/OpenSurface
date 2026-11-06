@@ -1,0 +1,114 @@
+// SPDX-FileCopyrightText: 2026 dastardlyrat and OpenSurface contributors
+// SPDX-License-Identifier: MIT
+// Generated example consumer; copy to reshade-shaders/Shaders and remove .example.
+
+#include "ReShade.fxh"
+#include "camera_obscura/api/CAMERA_OBSCURA_API_All.fxh"
+
+uniform bool CAMERA_OBSCURA_EX_CoreEnabled
+<
+    ui_type = "checkbox";
+    ui_category = "Camera Obscura API Examples / Core Walkthrough";
+    ui_label = "Enable Core Composite";
+> = true;
+
+uniform float CAMERA_OBSCURA_EX_CoreStrength
+<
+    ui_type = "slider";
+    ui_category = "Camera Obscura API Examples / Core Walkthrough";
+    ui_label = "Composite Strength";
+    ui_min = 0.0;
+    ui_max = 1.0;
+    ui_step = 0.01;
+> = 0.20;
+
+uniform int CAMERA_OBSCURA_EX_CoreView
+<
+    ui_type = "combo";
+    ui_category = "Camera Obscura API Examples / Core Walkthrough";
+    ui_label = "View";
+    ui_items = "Composite\0DDA Hit\0March Hit\0Agreement\0DDA Contribution\0March Contribution\0Reasons\0Composite Delta\0Provider Balance\0Source\0";
+> = 0;
+
+uniform float CAMERA_OBSCURA_EX_FrameCount
+< source = "framecount"; >;
+
+float4 CAMERA_OBSCURA_API_CoreWalkthrough_PS(
+    float4 position : SV_Position,
+    float2 uv : TEXCOORD) : SV_Target
+{
+    float4 source = tex2D(ReShade::BackBuffer, uv);
+    CAMERA_OBSCURA_Capabilities capabilities =
+        CAMERA_OBSCURA_API_QueryCapabilities();
+
+    if (capabilities.has_color < 0.5 || capabilities.has_depth < 0.5)
+    {
+        return source;
+    }
+
+    CAMERA_OBSCURA_API_Context context = CAMERA_OBSCURA_API_MakeContext(
+        uv,
+        position.xy,
+        CAMERA_OBSCURA_EX_FrameCount,
+        CAMERA_OBSCURA_API_STAGE_COHESION);
+    CAMERA_OBSCURA_SurfaceGuide surface =
+        CAMERA_OBSCURA_API_BuildSurface(context);
+    float2 direction = CAMERA_OBSCURA_API_SelectDirection(context);
+    CAMERA_OBSCURA_RayRequest request =
+        CAMERA_OBSCURA_API_DefaultRequest(direction);
+
+    request.spatial_phase = context.spatial_phase;
+
+    CAMERA_OBSCURA_TraceControls controls =
+        CAMERA_OBSCURA_API_BuildControls(request);
+    CAMERA_OBSCURA_Ray ray = CAMERA_OBSCURA_API_BuildRay(
+        context,
+        surface,
+        request,
+        controls);
+    CAMERA_OBSCURA_Hit dda = CAMERA_OBSCURA_API_TraceDDA(ray, controls);
+    CAMERA_OBSCURA_Hit march = CAMERA_OBSCURA_API_TraceMarch(ray, controls);
+    CAMERA_OBSCURA_DualHit dual =
+        CAMERA_OBSCURA_API_EvaluateDualHit(dda, march);
+    CAMERA_OBSCURA_Contribution ddaContribution =
+        CAMERA_OBSCURA_API_BuildContribution(context, surface, dda);
+    CAMERA_OBSCURA_Contribution marchContribution =
+        CAMERA_OBSCURA_API_BuildContribution(context, surface, march);
+    CAMERA_OBSCURA_Fallback fallback =
+        CAMERA_OBSCURA_API_DefaultFallback(context, surface);
+    float4 resolved = CAMERA_OBSCURA_API_Resolve(
+        dual,
+        ddaContribution,
+        marchContribution,
+        fallback);
+    float strength = CAMERA_OBSCURA_EX_CoreEnabled ?
+        CAMERA_OBSCURA_EX_CoreStrength : 0.0;
+    float3 composite = CAMERA_OBSCURA_API_Composite(
+        fallback,
+        resolved,
+        strength);
+    float3 outputColor = CAMERA_OBSCURA_API_DebugView(
+        (float)CAMERA_OBSCURA_EX_CoreView,
+        source.rgb,
+        composite,
+        dda,
+        march,
+        dual,
+        ddaContribution,
+        marchContribution);
+
+    return float4(saturate(outputColor), source.a);
+}
+
+technique CAMERA_OBSCURA_API_CoreWalkthrough
+<
+    ui_label = "Camera Obscura API - Core Walkthrough";
+    ui_tooltip = "Generated example of the documented core wrapper flow. Validate depth and inspect diagnostics before judging the composite.";
+>
+{
+    pass
+    {
+        VertexShader = PostProcessVS;
+        PixelShader = CAMERA_OBSCURA_API_CoreWalkthrough_PS;
+    }
+}

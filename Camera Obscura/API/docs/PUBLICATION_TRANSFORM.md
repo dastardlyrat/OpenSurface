@@ -26,9 +26,17 @@ checks that parity for every hosted header.
 Documentation paths and generated hashes are regenerated against the public
 layout. Those documentation changes do not change shader implementation.
 
+## Generated additions
+
+Three example consumers are newly authored publication material rather than
+recovered source. They remain outside the install tree and use the dormant
+`.fx.example` suffix. Their role is to demonstrate explicit core, Twin Lantern
+parity, and bounded-composite adoption; they are not included in the 38-file
+origin-parity claim.
+
 ## Exclusions
 
-The export does not include effects, presets, compiler logs, runtime logs,
+The export does not include loadable effects, presets, compiler logs, runtime logs,
 private workshop records, mill artifacts, inbox or outbox packages, machine
 paths, credentials, or the accepted frozen runtime tree.
 

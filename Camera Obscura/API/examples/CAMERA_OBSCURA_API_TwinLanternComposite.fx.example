@@ -1,0 +1,135 @@
+// SPDX-FileCopyrightText: 2026 dastardlyrat and OpenSurface contributors
+// SPDX-License-Identifier: MIT
+// Generated example consumer; copy to reshade-shaders/Shaders and remove .example.
+
+#include "ReShade.fxh"
+#include "camera_obscura/api/CAMERA_OBSCURA_API_TwinLanternComposite.fxh"
+
+uniform bool CAMERA_OBSCURA_EX_TLCompositeEnabled
+<
+    ui_type = "checkbox";
+    ui_category = "Camera Obscura API Examples / Twin Lantern Composite";
+    ui_label = "Enable Bounded Composite";
+    ui_tooltip = "Off preserves the source exactly. Enable only after inspecting transport evidence and confirming depth behavior.";
+> = false;
+
+uniform int CAMERA_OBSCURA_EX_TLCompositeDirection
+<
+    ui_type = "slider";
+    ui_category = "Camera Obscura API Examples / Twin Lantern Composite";
+    ui_label = "Direction Index";
+    ui_min = 0;
+    ui_max = 7;
+> = 0;
+
+uniform int CAMERA_OBSCURA_EX_TLCompositeView
+<
+    ui_type = "combo";
+    ui_category = "Camera Obscura API Examples / Twin Lantern Composite";
+    ui_label = "View";
+    ui_items = "Final Composite\0Combined Donor\0Bounded Contribution\0Transport Evidence\0Admission And Application\0Provider Weights\0Source\0";
+> = 0;
+
+uniform float CAMERA_OBSCURA_EX_TLCompositeStrength
+<
+    ui_type = "slider";
+    ui_category = "Camera Obscura API Examples / Twin Lantern Composite";
+    ui_label = "Strength";
+    ui_min = 0.0;
+    ui_max = 1.0;
+    ui_step = 0.01;
+> = 0.25;
+
+uniform float CAMERA_OBSCURA_EX_TLCompositeMaximum
+<
+    ui_type = "slider";
+    ui_category = "Camera Obscura API Examples / Twin Lantern Composite";
+    ui_label = "Maximum Contribution";
+    ui_min = 0.0;
+    ui_max = 0.25;
+    ui_step = 0.005;
+> = 0.08;
+
+float4 CAMERA_OBSCURA_API_TwinLanternCompositeExample_PS(
+    float4 position : SV_Position,
+    float2 uv : TEXCOORD) : SV_Target
+{
+    float4 source = tex2D(ReShade::BackBuffer, uv);
+    CAMERA_OBSCURA_API_TwinLanternTransportEvidence transport =
+        CAMERA_OBSCURA_API_BuildTwinLanternTransportEvidence(
+            uv,
+            (float)CAMERA_OBSCURA_EX_TLCompositeDirection,
+            CAMERA_OBSCURA_API_TL45_INPUT_LIVE,
+            CAMERA_OBSCURA_API_TL07_MODE_COMPLEMENTARY,
+            16.0,
+            0.15,
+            0.0005,
+            0.0035);
+    CAMERA_OBSCURA_API_TL09CompositeEvidence composite =
+        CAMERA_OBSCURA_API_BuildTL09Composite(
+            source.rgb,
+            transport.combined_donor_rgb,
+            transport.evidence_strength,
+            transport.receiver_valid,
+            CAMERA_OBSCURA_EX_TLCompositeEnabled ? 1.0 : 0.0,
+            CAMERA_OBSCURA_EX_TLCompositeStrength,
+            CAMERA_OBSCURA_EX_TLCompositeMaximum);
+    float3 outputColor;
+
+    if (CAMERA_OBSCURA_EX_TLCompositeView == 0)
+    {
+        outputColor = composite.final_rgb;
+    }
+    else if (CAMERA_OBSCURA_EX_TLCompositeView == 1)
+    {
+        outputColor = transport.combined_donor_rgb;
+    }
+    else if (CAMERA_OBSCURA_EX_TLCompositeView == 2)
+    {
+        outputColor = saturate(composite.bounded_contribution_rgb * 8.0);
+    }
+    else if (CAMERA_OBSCURA_EX_TLCompositeView == 3)
+    {
+        outputColor = CAMERA_OBSCURA_DebugHeat(
+            transport.evidence_strength);
+    }
+    else if (CAMERA_OBSCURA_EX_TLCompositeView == 4)
+    {
+        outputColor = float3(
+            composite.admission,
+            composite.application,
+            composite.rejection);
+    }
+    else if (CAMERA_OBSCURA_EX_TLCompositeView == 5)
+    {
+        outputColor = float3(
+            transport.dda_normalized_weight,
+            transport.march_normalized_weight,
+            transport.one_provider_bound_ok);
+    }
+    else
+    {
+        outputColor = source.rgb;
+    }
+
+    if (!CAMERA_OBSCURA_EX_TLCompositeEnabled &&
+        CAMERA_OBSCURA_EX_TLCompositeView == 0)
+    {
+        return source;
+    }
+
+    return float4(saturate(outputColor), source.a);
+}
+
+technique CAMERA_OBSCURA_API_TwinLanternCompositeExample
+<
+    ui_label = "Camera Obscura API - Twin Lantern Bounded Composite";
+    ui_tooltip = "Generated example connecting complementary transport evidence to the bounded TL09 composite contract. Disabled by default.";
+>
+{
+    pass
+    {
+        VertexShader = PostProcessVS;
+        PixelShader = CAMERA_OBSCURA_API_TwinLanternCompositeExample_PS;
+    }
+}

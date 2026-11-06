@@ -51,8 +51,8 @@ Specification: REUSE 3.3
 
 Result: compliant.
 
-- covered files with copyright information: 78/78;
-- covered files with licensing information: 78/78;
+- covered files with copyright information: 82/82;
+- covered files with licensing information: 82/82;
 - bad, deprecated, missing, unused, or malformed licenses: zero;
 - used licenses: `MIT` and `LicenseRef-Documentation-Screenshot`.
 

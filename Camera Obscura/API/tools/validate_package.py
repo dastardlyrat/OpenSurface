@@ -17,8 +17,33 @@ SHADER_ROOT = PROJECT_ROOT / "reshade-shaders" / "Shaders" / "camera_obscura"
 API_ROOT = SHADER_ROOT / "api"
 HEADER_ROOT = SHADER_ROOT / "header"
 DOC_ROOT = PROJECT_ROOT / "docs"
+EXAMPLE_ROOT = PROJECT_ROOT / "examples"
 ORIGIN_MANIFEST = DOC_ROOT / "SOURCE_ORIGIN.sha256"
 SPDX_LICENSE_MARKER = "SPDX-" + "License-Identifier:"
+EXPECTED_EXAMPLES = {
+    "CAMERA_OBSCURA_API_CoreWalkthrough.fx.example":
+        "CAMERA_OBSCURA_API_CoreWalkthrough",
+    "CAMERA_OBSCURA_API_TwinLanternParity.fx.example":
+        "CAMERA_OBSCURA_API_TwinLanternParityExample",
+    "CAMERA_OBSCURA_API_TwinLanternComposite.fx.example":
+        "CAMERA_OBSCURA_API_TwinLanternCompositeExample",
+}
+EXPECTED_EXAMPLE_SYMBOLS = {
+    "CAMERA_OBSCURA_API_CoreWalkthrough.fx.example": {
+        "CAMERA_OBSCURA_API_MakeContext",
+        "CAMERA_OBSCURA_API_TraceDDA",
+        "CAMERA_OBSCURA_API_TraceMarch",
+        "CAMERA_OBSCURA_API_Resolve",
+        "CAMERA_OBSCURA_API_DebugView",
+    },
+    "CAMERA_OBSCURA_API_TwinLanternParity.fx.example": {
+        "CAMERA_OBSCURA_API_BuildTwinLanternParityEvidence",
+    },
+    "CAMERA_OBSCURA_API_TwinLanternComposite.fx.example": {
+        "CAMERA_OBSCURA_API_BuildTwinLanternTransportEvidence",
+        "CAMERA_OBSCURA_API_BuildTL09Composite",
+    },
+}
 PUBLICATION_PREFIX = (
     b"// SPDX-FileCopyrightText: 2026 dastardlyrat and OpenSurface contributors\n"
     + f"// {SPDX_LICENSE_MARKER} MIT\n\n".encode("ascii")
@@ -97,7 +122,11 @@ def validate_include_closure(files: list[Path]) -> tuple[bool, str]:
 def validate_links() -> tuple[bool, str]:
     markdown_link = re.compile(r"(?<!!)\[[^\]]+\]\(([^)]+)\)")
     broken: list[str] = []
-    documents = sorted([PROJECT_ROOT / "README.md", *DOC_ROOT.glob("*.md")])
+    documents = sorted([
+        PROJECT_ROOT / "README.md",
+        EXAMPLE_ROOT / "README.md",
+        *DOC_ROOT.glob("*.md"),
+    ])
     for document in documents:
         text = document.read_text(encoding="utf-8")
         for reference in markdown_link.findall(text):
@@ -112,6 +141,65 @@ def validate_links() -> tuple[bool, str]:
     return not broken, f"documents={len(documents)}; broken={len(broken)}"
 
 
+def validate_examples() -> tuple[bool, str]:
+    include_pattern = re.compile(r'^\s*#include\s+"([^"]+)"', re.MULTILINE)
+    technique_pattern = re.compile(r"^\s*technique\s+([A-Za-z_][A-Za-z0-9_]*)", re.MULTILINE)
+    files = sorted(EXAMPLE_ROOT.glob("*.fx.example"))
+    actual_names = {path.name for path in files}
+    missing_files = set(EXPECTED_EXAMPLES) - actual_names
+    extra_files = actual_names - set(EXPECTED_EXAMPLES)
+    missing_includes: list[str] = []
+    technique_failures: list[str] = []
+    symbol_failures: list[str] = []
+    balance_failures: list[str] = []
+    license_failures: list[str] = []
+    includes = 0
+    external_includes = 0
+
+    for path in files:
+        source = path.read_text(encoding="utf-8")
+        found_techniques = technique_pattern.findall(source)
+        expected_technique = EXPECTED_EXAMPLES.get(path.name)
+        if found_techniques != [expected_technique]:
+            technique_failures.append(path.name)
+        missing_symbols = EXPECTED_EXAMPLE_SYMBOLS.get(path.name, set()) - set(
+            re.findall(r"\b[A-Za-z_][A-Za-z0-9_]*\b", source)
+        )
+        if missing_symbols:
+            symbol_failures.append(path.name)
+        if source.count("{") != source.count("}"):
+            balance_failures.append(path.name)
+        if f"{SPDX_LICENSE_MARKER} MIT" not in source:
+            license_failures.append(path.name)
+        for include in include_pattern.findall(source):
+            includes += 1
+            if include == "ReShade.fxh":
+                external_includes += 1
+                continue
+            installed_target = SHADER_ROOT.parent / include
+            if not installed_target.is_file():
+                missing_includes.append(f"{path.name} -> {include}")
+
+    passed = not any((
+        missing_files,
+        extra_files,
+        missing_includes,
+        technique_failures,
+        symbol_failures,
+        balance_failures,
+        license_failures,
+    ))
+    return (
+        passed,
+        f"examples={len(files)}; includes={includes}; "
+        f"external={external_includes}; missing_includes={len(missing_includes)}; "
+        f"technique_failures={len(technique_failures)}; "
+        f"symbol_failures={len(symbol_failures)}; "
+        f"balance_failures={len(balance_failures)}; "
+        f"license_failures={len(license_failures)}",
+    )
+
+
 def validate_public_boundary() -> tuple[bool, str]:
     patterns = {
         "windows_user_path": re.compile(r"[A-Za-z]:\\Users\\", re.IGNORECASE),
@@ -124,7 +212,11 @@ def validate_public_boundary() -> tuple[bool, str]:
     for path in sorted(PROJECT_ROOT.rglob("*")):
         if not path.is_file():
             continue
-        if path.suffix.lower() not in {"", ".csv", ".fxh", ".json", ".md", ".py", ".sha256", ".txt"}:
+        if (
+            path.suffix.lower() not in
+            {"", ".csv", ".fxh", ".json", ".md", ".py", ".sha256", ".txt"}
+            and not path.name.endswith(".fx.example")
+        ):
             continue
         text = path.read_text(encoding="utf-8")
         for name, pattern in patterns.items():
@@ -199,6 +291,9 @@ def main() -> int:
         ", ".join(f"{name}={summary.get(name)}" for name in expected_summary),
     ))
 
+    examples_passed, examples_detail = validate_examples()
+    checks.append(report("dormant_examples", examples_passed, examples_detail))
+
     links_passed, links_detail = validate_links()
     checks.append(report("local_documentation_links", links_passed, links_detail))
 
@@ -214,6 +309,9 @@ def main() -> int:
         DOC_ROOT / "SOURCE_ORIGIN.sha256",
         DOC_ROOT / "SYMBOLS.json",
         DOC_ROOT / "VALIDATION.md",
+        DOC_ROOT / "PUBLICATION_TRANSFORM.md",
+        EXAMPLE_ROOT / "README.md",
+        *[EXAMPLE_ROOT / name for name in EXPECTED_EXAMPLES],
     ]
     missing_required = [relative(path) for path in required if not path.is_file()]
     checks.append(report(

@@ -91,7 +91,19 @@ repository, commit, and original authorship remain recorded above.
   umbrella and are not silently presented as wired or stable
 - License: hosted public copies follow the repository's MIT publication policy
   and carry inline SPDX metadata
-- Fresh public-package evidence: 9/9 bounded package checks pass, including
+- Generated example consumers: core wrapper walkthrough, Twin Lantern provider
+  parity inspection, and complementary transport through the TL09 bounded
+  composite contract; stored as dormant `.fx.example` files outside the
+  install tree
+- Twin Lantern API comparison: the live public 0.1.0 contract registry at
+  `alia-june/Lunar-Flower` was inspected at commit
+  `864377b03af50779415b59aa4857305831603f70`; all eight registered shared
+  implementation files match the hosted OpenSurface copies after removal of
+  publication SPDX prefixes
+- Example contract boundary: the transport/composite example uses registered
+  Twin Lanterns 0.1.0 entrypoints; the parity inspector uses a source-present
+  OpenSurface extension outside that versioned twelve-symbol contract
+- Fresh public-package evidence: 10/10 bounded package checks pass, including
   38/38 origin implementation parity and 53/53 local include resolution
 - Unresolved evidence: no consuming-effect compile, ReShade runtime, target-game
   depth, performance, visual acceptance, or stable-symbol compatibility claim
