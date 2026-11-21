@@ -303,3 +303,11 @@ for machine-readable copyright and licensing metadata.
 *Inspectable inputs. Bounded corrections. Reversible experiments.*
 
 </div>
+
+## Project directory and related work
+
+[Browse the dastardlyrat project directory](https://dastardlyrat.github.io/).
+
+- [OpenSurface-CameraObscura-GuidedDetail](https://github.com/dastardlyrat/OpenSurface-CameraObscura-GuidedDetail)
+- [Lazara-Reshade-Revival-Package](https://github.com/dastardlyrat/Lazara-Reshade-Revival-Package)
+- [reshade-preset-catalog](https://github.com/dastardlyrat/reshade-preset-catalog)
